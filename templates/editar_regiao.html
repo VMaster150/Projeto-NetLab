@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar região | NetLab</title>
+</head>
+<body>
+
+    <h1>NetLab — Editar região</h1>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensagem in mensagens %}
+            <p>{{ mensagem }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <label for="nome">Nome da região:</label>
+        <input
+            type="text"
+            id="nome"
+            name="nome"
+            maxlength="150"
+            value="{{ regiao.nome }}"
+            required
+        >
+
+        <br><br>
+
+        <label for="descricao">Descrição:</label>
+        <textarea
+            id="descricao"
+            name="descricao"
+            maxlength="1000"
+        >{{ regiao.descricao or '' }}</textarea>
+
+        <br><br>
+
+        <label for="regiao_pai_id">Região pai:</label>
+
+        <select id="regiao_pai_id" name="regiao_pai_id">
+            <option value="">Nenhuma — região principal</option>
+
+            {% for item in regioes_para_selecao %}
+                <option
+                    value="{{ item.id }}"
+                    {% if regiao.regiao_pai_id == item.id %}selected{% endif %}
+                >
+                    {{ "— " * item.nivel }}{{ item.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <button type="submit">Salvar alterações</button>
+
+        <a href="{{ url_for('regiao') }}">Cancelar</a>
+
+    </form>
+
+</body>
+</html>
