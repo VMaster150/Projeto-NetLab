@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar região | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header><p class="brand">NetLab</p><p>Gestão de infraestrutura de rede</p></header>
+<main>
+    <section class="welcome">
+        <h1>Editar região</h1>
+        <p>Atualize as informações de <strong>{{ regiao.nome }}</strong>.</p>
+    </section>
+    <section class="panel">
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="flash {{ categoria }}">{{ mensagem }}</p>
+            {% endfor %}
+        {% endwith %}
+        <form method="POST">
+            <label for="nome">Nome da região</label>
+            <input type="text" id="nome" name="nome" maxlength="150" value="{{ regiao.nome }}" required>
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" maxlength="1000">{{ regiao.descricao or '' }}</textarea>
+            <label for="regiao_pai_id">Região pai</label>
+            <select id="regiao_pai_id" name="regiao_pai_id">
+                <option value="">Nenhuma — região principal</option>
+                {% for item in regioes_para_selecao %}
+                    <option value="{{ item.id }}" {% if regiao.regiao_pai_id == item.id %}selected{% endif %}>
+                        {{ "— " * item.nivel }}{{ item.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Salvar alterações</button>
+            <a class="button secondary" href="{{ url_for('regiao') }}">Cancelar</a>
+        </form>
+    </section>
+</main>
+<footer>NetLab · Gerenciamento de redes</footer>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regiões | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header><p class="brand">NetLab</p><p>Gestão de infraestrutura de rede</p></header>
+<main>
+    <section class="welcome">
+        <h1>Regiões</h1>
+        <p>Cadastre, organize e gerencie as regiões da sua infraestrutura.</p>
+    </section>
+    <section class="panel">
+        <h2>Cadastrar região</h2>
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="flash {{ categoria }}">{{ mensagem }}</p>
+            {% endfor %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('regiao') }}">
+            <label for="nome">Nome da região</label>
+            <input type="text" id="nome" name="nome" maxlength="150" placeholder="Ex.: Região Nordeste" required>
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" maxlength="1000" placeholder="Adicione detalhes sobre esta região..."></textarea>
+            <label for="regiao_pai_id">Região pai</label>
+            <select id="regiao_pai_id" name="regiao_pai_id">
+                <option value="">Nenhuma — região principal</option>
+                {% for item in regioes_para_selecao %}
+                    <option value="{{ item.id }}">{{ "— " * item.nivel }}{{ item.nome }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">＋ Cadastrar região</button>
+        </form>
+    </section>
+    <section class="panel">
+        <div class="panel-heading"><h2>Árvore de regiões</h2><span class="region-meta">{{ regioes|length }} cadastrada(s)</span></div>
+        {% macro listar_regioes(lista_regioes) %}
+            <ul class="tree">
+                {% for regiao in lista_regioes|sort(attribute='nome') %}
+                    <li>
+                        <div class="region-item">
+                            <div class="region-top">
+                                <span class="region-name">{{ regiao.nome }}</span>
+                                <div class="actions">
+                                    <a href="{{ url_for('editar_regiao', id=regiao.id) }}">Editar</a>
+                                    <form class="inline-form" action="{{ url_for('excluir_regiao', id=regiao.id) }}" method="POST" onsubmit="return confirm('Tem certeza de que deseja excluir esta região?');">
+                                        <button class="danger" type="submit">Excluir</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% if regiao.regiao_pai %}
+                                <small class="region-meta">Sub-região de {{ regiao.regiao_pai.nome }}</small>
+                            {% else %}
+                                <small class="region-meta">Região principal</small>
+                            {% endif %}
+                            {% if regiao.descricao %}<p class="region-description">{{ regiao.descricao }}</p>{% endif %}
+                            {% if regiao.subregioes %}{{ listar_regioes(regiao.subregioes) }}{% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endmacro %}
+        {% if regioes_principais %}
+            {{ listar_regioes(regioes_principais) }}
+        {% else %}
+            <div class="empty"><strong>Nenhuma região cadastrada</strong><p>Use o formulário acima para criar a primeira região.</p></div>
+        {% endif %}
+    </section>
+    <a class="button secondary" href="{{ url_for('index') }}">← Voltar ao início</a>
+</main>
+<footer>NetLab · Gerenciamento de redes</footer>
+</body>
+</html>
