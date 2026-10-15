@@ -1,7 +1,11 @@
-
 from flask import *
 from config import db
 from models.regiao import Regiao
+from models.fabricante import Fabricante
+from models.modelo_equipamento import ModeloEquipamento
+from models.interface_modelo import InterfaceModelo
+from models.porta_alimentacao_modelo import PortaAlimentacaoModelo
+from models.equipamento import Equipamento
 
 app = Flask(__name__)
 
@@ -202,6 +206,136 @@ def excluir_regiao(id):
         flash("Não foi possível excluir a região.", "erro")
 
     return redirect(url_for("regiao"))
+
+
+@app.route("/equipamentos", methods=["GET", "POST"])
+def equipamentos():
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        tipo = request.form.get("tipo", "").strip()
+        regiao_id = request.form.get("regiao_id", "").strip()
+        fabricante_id = request.form.get("fabricante_id", "").strip()
+        modelo_id = request.form.get("modelo_id", "").strip()
+
+        if not nome or not tipo or not regiao_id:
+            flash(
+                "Preencha o nome, o tipo e a região.",
+                "erro"
+            )
+            return redirect(url_for("equipamentos"))
+
+        try:
+            regiao = db.session.get(Regiao, int(regiao_id))
+
+            if regiao is None:
+                flash("A região selecionada não existe.", "erro")
+                return redirect(url_for("equipamentos"))
+
+            fabricante = None
+            modelo = None
+
+            if fabricante_id:
+                fabricante = db.session.get(
+                    Fabricante, int(fabricante_id)
+                )
+
+                if fabricante is None:
+                    flash("Fabricante não encontrado.", "erro")
+                    return redirect(url_for("equipamentos"))
+
+            if modelo_id:
+                modelo = db.session.get(
+                    ModeloEquipamento, int(modelo_id)
+                )
+
+                if modelo is None:
+                    flash("Modelo não encontrado.", "erro")
+                    return redirect(url_for("equipamentos"))
+
+                if fabricante is None:
+                    fabricante = modelo.fabricante
+                elif modelo.fabricante_id != fabricante.id:
+                    flash(
+                        "O modelo não pertence ao fabricante selecionado.",
+                        "erro"
+                    )
+                    return redirect(url_for("equipamentos"))
+
+            novo_equipamento = Equipamento(
+                nome=nome,
+                tipo=tipo,
+                regiao_id=regiao.id,
+                fabricante_id=fabricante.id if fabricante else None,
+                modelo_id=modelo.id if modelo else None
+            )
+
+            db.session.add(novo_equipamento)
+            db.session.commit()
+
+            flash("Equipamento cadastrado com sucesso!", "sucesso")
+            return redirect(url_for("equipamentos"))
+
+        except ValueError:
+            db.session.rollback()
+            flash("Selecione identificadores válidos.", "erro")
+            return redirect(url_for("equipamentos"))
+
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Erro ao cadastrar equipamento")
+            flash("Não foi possível cadastrar o equipamento.", "erro")
+            return redirect(url_for("equipamentos"))
+
+    regioes = Regiao.query.order_by(Regiao.nome).all()
+    fabricantes = Fabricante.query.order_by(Fabricante.nome).all()
+
+    equipamentos_cadastrados = (
+        Equipamento.query
+        .order_by(Equipamento.nome)
+        .all()
+    )
+
+    return render_template(
+        "equipamentos.html",
+        regioes=regioes,
+        fabricantes=fabricantes,
+        equipamentos=equipamentos_cadastrados
+    )
+
+
+@app.route("/api/fabricantes/<int:fabricante_id>/modelos")
+def modelos_por_fabricante(fabricante_id):
+    fabricante = db.session.get(Fabricante, fabricante_id)
+
+    if fabricante is None:
+        return {"erro": "Fabricante não encontrado."}, 404
+
+    modelos = (
+        ModeloEquipamento.query
+        .filter_by(fabricante_id=fabricante_id)
+        .order_by(ModeloEquipamento.modelo)
+        .all()
+    )
+
+    return {
+        "modelos": [
+            {
+                "id": modelo.id,
+                "nome": modelo.modelo
+            }
+            for modelo in modelos
+        ]
+    }
+
+
+@app.route("/equipamentos/<int:id>")
+def detalhe_equipamento(id):
+    equipamento = db.get_or_404(Equipamento, id)
+
+    return render_template(
+        "detalhe_equipamento.html",
+        equipamento=equipamento
+    )
 
 
 
