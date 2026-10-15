@@ -1,9 +1,14 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc53c3a2e06f30346f18496c7ee81a968fcaab58
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regiões | NetLab</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -72,5 +77,116 @@
     <a class="button secondary" href="{{ url_for('index') }}">← Voltar ao início</a>
 </main>
 <footer>NetLab · Gerenciamento de redes</footer>
+=======
+</head>
+<body>
+
+    <h1>NetLab — Regiões</h1>
+
+    <h2>Cadastrar região</h2>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensagem in mensagens %}
+            <p>{{ mensagem }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('regiao') }}">
+
+        <label for="nome">Nome da região:</label>
+        <input
+            type="text"
+            id="nome"
+            name="nome"
+            maxlength="150"
+            required
+        >
+
+        <br><br>
+
+        <label for="descricao">Descrição:</label>
+        <textarea
+            id="descricao"
+            name="descricao"
+            maxlength="1000"
+        ></textarea>
+
+        <br><br>
+
+
+        <label for="regiao_pai_id">Região pai:</label>
+
+        <select id="regiao_pai_id" name="regiao_pai_id">
+            <option value="">Nenhuma — região principal</option>
+
+            {% for item in regioes_para_selecao %}
+                <option value="{{ item.id }}">
+                    {{ "— " * item.nivel }}{{ item.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+
+        <br><br>
+
+        <button type="submit">Cadastrar região</button>
+
+    </form>
+
+    <hr>
+
+
+<h2>Árvore de regiões</h2>
+
+{% macro listar_regioes(lista_regioes) %}
+    <ul>
+        {% for regiao in lista_regioes|sort(attribute='nome') %}
+            <li>
+                <strong>{{ regiao.nome }}</strong>
+                <a href="{{ url_for('editar_regiao', id=regiao.id) }}">Editar</a>
+
+
+                <form
+                    action="{{ url_for('excluir_regiao', id=regiao.id) }}"
+                    method="POST"
+                    style="display: inline;"
+                    onsubmit="return confirm('Tem certeza de que deseja excluir esta região?');"
+                >
+                    <button type="submit">Excluir</button>
+                </form>
+
+
+                {% if regiao.regiao_pai %}
+                    <small>
+                        — Sub-região de {{ regiao.regiao_pai.nome }}
+                    </small>
+                {% else %}
+                    <small>— Região principal</small>
+                {% endif %}
+
+                {% if regiao.descricao %}
+                    <p>{{ regiao.descricao }}</p>
+                {% endif %}
+
+                {% if regiao.subregioes %}
+                    {{ listar_regioes(regiao.subregioes) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% if regioes_principais %}
+    {{ listar_regioes(regioes_principais) }}
+{% else %}
+    <p>Nenhuma região cadastrada.</p>
+{% endif %}
+
+
+
+
+    <p><a href="{{ url_for('index') }}">Voltar ao início</a></p>
+
+>>>>>>> cc53c3a2e06f30346f18496c7ee81a968fcaab58
 </body>
 </html>
