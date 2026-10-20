@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipamentos | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+    </nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Equipamentos</h1>
+        <p>Cadastre e organize os dispositivos da sua infraestrutura de rede.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="grade">
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Novo equipamento</h2>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('equipamentos') }}"
+                  class="formulario">
+
+                <div class="campo">
+                    <label for="nome">Nome do equipamento *</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="150"
+                        placeholder="Ex.: Switch do laboratório"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="tipo">Tipo de equipamento *</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="">Selecione um tipo</option>
+                        <option value="Roteador">Roteador</option>
+                        <option value="Switch">Switch</option>
+                        <option value="Computador">Computador</option>
+                        <option value="Notebook">Notebook</option>
+                        <option value="Celular">Celular</option>
+                        <option value="Servidor">Servidor</option>
+                        <option value="Access Point">Access Point</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="regiao_id">Região *</label>
+                    <select id="regiao_id" name="regiao_id" required>
+                        <option value="">Selecione uma região</option>
+
+                        {% for regiao in regioes %}
+                            <option value="{{ regiao.id }}">
+                                {{ regiao.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="fabricante_id">Fabricante</label>
+                    <select id="fabricante_id" name="fabricante_id">
+                        <option value="">Selecione um fabricante</option>
+
+                        {% for fabricante in fabricantes %}
+                            <option value="{{ fabricante.id }}">
+                                {{ fabricante.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="modelo_id">Modelo</label>
+                    <select id="modelo_id" name="modelo_id" disabled>
+                        <option value="">Selecione primeiro um fabricante</option>
+                    </select>
+                    <small style="color: var(--texto-suave);">
+                        Os modelos serão carregados conforme o fabricante selecionado.
+                    </small>
+                </div>
+
+                <button type="submit">Cadastrar equipamento</button>
+            </form>
+        </article>
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Equipamentos cadastrados</h2>
+                <span class="etiqueta">{{ equipamentos|length }} registrados</span>
+            </div>
+
+            {% if equipamentos %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Região</th>
+                                <th>Fabricante / Modelo</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipamento in equipamentos %}
+                                <tr>
+                                    <td><strong>{{ equipamento.nome }}</strong></td>
+                                    <td>{{ equipamento.tipo }}</td>
+                                    <td>
+                                        {{ equipamento.regiao.nome
+                                           if equipamento.regiao else 'Não definida' }}
+                                    </td>
+                                    <td>
+                                        {% if equipamento.fabricante %}
+                                            {{ equipamento.fabricante.nome }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+
+                                        {% if equipamento.modelo %}
+                                            <br>
+                                            <small>{{ equipamento.modelo.modelo }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a class="botao botao-secundario"
+                                           href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+                                            Detalhes
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhum equipamento cadastrado.</p>
+                    <p>Use o formulário para adicionar o primeiro dispositivo.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    <div style="margin-top: 24px;">
+        <a class="botao botao-secundario" href="{{ url_for('index') }}">
+            ← Voltar ao início
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Inventário de equipamentos de rede
+</footer>
+
+<script>
+    const seletorFabricante = document.getElementById("fabricante_id");
+    const seletorModelo = document.getElementById("modelo_id");
+
+    seletorFabricante.addEventListener("change", async function () {
+        const fabricanteId = this.value;
+
+        seletorModelo.innerHTML = "";
+
+        if (!fabricanteId) {
+            seletorModelo.add(new Option(
+                "Selecione primeiro um fabricante",
+                ""
+            ));
+            seletorModelo.disabled = true;
+            return;
+        }
+
+        seletorModelo.disabled = true;
+        seletorModelo.add(new Option("Carregando modelos...", ""));
+
+        try {
+            const resposta = await fetch(
+                `/api/fabricantes/${fabricanteId}/modelos`
+            );
+
+            if (!resposta.ok) {
+                throw new Error("Falha ao consultar modelos");
+            }
+
+            const dados = await resposta.json();
+
+            seletorModelo.innerHTML = "";
+            seletorModelo.add(new Option("Selecione um modelo", ""));
+
+            for (const modelo of dados.modelos) {
+                seletorModelo.add(
+                    new Option(modelo.nome, modelo.id)
+                );
+            }
+
+            if (dados.modelos.length === 0) {
+                seletorModelo.innerHTML = "";
+                seletorModelo.add(
+                    new Option("Nenhum modelo encontrado", "")
+                );
+            }
+
+        } catch (erro) {
+            seletorModelo.innerHTML = "";
+            seletorModelo.add(
+                new Option("Erro ao carregar modelos", "")
+            );
+            console.error(erro);
+        } finally {
+            seletorModelo.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>

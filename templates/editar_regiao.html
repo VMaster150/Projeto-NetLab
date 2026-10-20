@@ -1,107 +1,109 @@
-<<<<<<< HEAD
-=======
 
->>>>>>> cc53c3a2e06f30346f18496c7ee81a968fcaab58
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar região | NetLab</title>
-<<<<<<< HEAD
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<header><p class="brand">NetLab</p><p>Gestão de infraestrutura de rede</p></header>
-<main>
-    <section class="welcome">
-        <h1>Editar região</h1>
-        <p>Atualize as informações de <strong>{{ regiao.nome }}</strong>.</p>
-    </section>
-    <section class="panel">
-        {% with mensagens = get_flashed_messages(with_categories=true) %}
-            {% for categoria, mensagem in mensagens %}
-                <p class="flash {{ categoria }}">{{ mensagem }}</p>
-            {% endfor %}
-        {% endwith %}
-        <form method="POST">
-            <label for="nome">Nome da região</label>
-            <input type="text" id="nome" name="nome" maxlength="150" value="{{ regiao.nome }}" required>
-            <label for="descricao">Descrição</label>
-            <textarea id="descricao" name="descricao" maxlength="1000">{{ regiao.descricao or '' }}</textarea>
-            <label for="regiao_pai_id">Região pai</label>
-            <select id="regiao_pai_id" name="regiao_pai_id">
-                <option value="">Nenhuma — região principal</option>
-                {% for item in regioes_para_selecao %}
-                    <option value="{{ item.id }}" {% if regiao.regiao_pai_id == item.id %}selected{% endif %}>
-                        {{ "— " * item.nivel }}{{ item.nome }}
-                    </option>
-                {% endfor %}
-            </select>
-            <button type="submit">Salvar alterações</button>
-            <a class="button secondary" href="{{ url_for('regiao') }}">Cancelar</a>
-        </form>
-    </section>
-</main>
-<footer>NetLab · Gerenciamento de redes</footer>
-=======
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <h1>NetLab — Editar região</h1>
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regiao') }}" class="ativo">Regiões</a>
+        <a href="{{ url_for('equipamentos') }}">Equipamentos</a>
+    </nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Editar região</h1>
+        <p>Atualize as informações do local selecionado.</p>
+    </section>
 
     {% with mensagens = get_flashed_messages(with_categories=true) %}
-        {% for categoria, mensagem in mensagens %}
-            <p>{{ mensagem }}</p>
-        {% endfor %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
 
-    <form method="POST">
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ regiao.nome }}</h2>
+            <span class="etiqueta">ID: {{ regiao.id }}</span>
+        </div>
 
-        <label for="nome">Nome da região:</label>
-        <input
-            type="text"
-            id="nome"
-            name="nome"
-            maxlength="150"
-            value="{{ regiao.nome }}"
-            required
-        >
+        <form method="POST"
+              action="{{ url_for('editar_regiao', id=regiao.id) }}"
+              class="formulario">
 
-        <br><br>
-
-        <label for="descricao">Descrição:</label>
-        <textarea
-            id="descricao"
-            name="descricao"
-            maxlength="1000"
-        >{{ regiao.descricao or '' }}</textarea>
-
-        <br><br>
-
-        <label for="regiao_pai_id">Região pai:</label>
-
-        <select id="regiao_pai_id" name="regiao_pai_id">
-            <option value="">Nenhuma — região principal</option>
-
-            {% for item in regioes_para_selecao %}
-                <option
-                    value="{{ item.id }}"
-                    {% if regiao.regiao_pai_id == item.id %}selected{% endif %}
+            <div class="campo">
+                <label for="nome">Nome da região *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    maxlength="150"
+                    value="{{ regiao.nome }}"
+                    required
                 >
-                    {{ "— " * item.nivel }}{{ item.nome }}
-                </option>
-            {% endfor %}
-        </select>
+            </div>
 
-        <br><br>
+            <div class="campo">
+                <label for="descricao">Descrição</label>
+                <textarea
+                    id="descricao"
+                    name="descricao"
+                    maxlength="1000"
+                >{{ regiao.descricao or '' }}</textarea>
+            </div>
 
-        <button type="submit">Salvar alterações</button>
+            <div class="campo">
+                <label for="regiao_pai_id">Região pai</label>
+                <select id="regiao_pai_id" name="regiao_pai_id">
+                    <option value="">Nenhuma — região principal</option>
 
-        <a href="{{ url_for('regiao') }}">Cancelar</a>
+                    {% for regiao_item in regioes_para_selecao %}
+                        {% if regiao_item.id != regiao.id %}
+                            <option
+                                value="{{ regiao_item.id }}"
+                                {% if regiao.regiao_pai_id == regiao_item.id %}selected{% endif %}
+                            >
+                                {{ "-- " * regiao_item.nivel }}{{ regiao_item.nome }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <small style="color: var(--texto-suave);">
+                    Escolha uma região pai para transformar este local em sub-região.
+                </small>
+            </div>
 
-    </form>
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+                <a class="botao botao-secundario"
+                   href="{{ url_for('regiao') }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
 
->>>>>>> cc53c3a2e06f30346f18496c7ee81a968fcaab58
+</main>
+
+<footer class="rodape">
+    NetLab · Edição de regiões
+</footer>
+
 </body>
 </html>

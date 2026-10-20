@@ -1,37 +1,78 @@
+
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetLab | Início</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<header><p class="brand">NetLab</p><p>Gestão de infraestrutura de rede</p></header>
-<main>
-    <section class="welcome">
-        <h1>Bem-vindo ao NetLab</h1>
-        <p>Organize os componentes da sua infraestrutura de rede em um só lugar.</p>
-    </section>
-    <section class="panel">
-        <h2>Comece por aqui</h2>
-        <p>Acesse a área de regiões para cadastrar localidades e montar uma estrutura hierárquica.</p>
-        <a class="button" href="{{ url_for('regiao') }}">Gerenciar regiões →</a>
-        <a class="button secondary" href="{{ url_for('teste_banco') }}">Testar conexão com banco</a>
-    </section>
-</main>
-<footer>NetLab · Gerenciamento de redes</footer>
-</body>
-</html>
-=======
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="theme-color" content="#0b1120">
+    <title>NetLab | Gerenciamento de Redes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}" class="ativo">Início</a>
+        <a href="{{ url_for('regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos') }}">Equipamentos</a>
+    </nav>
+</header>
+
+<main class="conteudo">
+    <section class="titulo-pagina">
+        <span class="etiqueta">GESTÃO DE INFRAESTRUTURA</span>
+        <h1>Bem-vindo ao NetLab</h1>
+        <p>Gerencie regiões, equipamentos e informações da sua infraestrutura de redes em um só lugar.</p>
+    </section>
+
+    <section class="grade">
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Regiões</h2>
+                <span class="etiqueta">01</span>
+            </div>
+
+            <p>Organize sua infraestrutura em locais e sub-regiões hierárquicas, como prédios, salas e setores.</p>
+
+            <a class="botao" href="{{ url_for('regiao') }}">
+                Gerenciar regiões →
+            </a>
+        </article>
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Equipamentos</h2>
+                <span class="etiqueta">02</span>
+            </div>
+
+            <p>Cadastre dispositivos, associe fabricantes e modelos e vincule cada equipamento à sua região.</p>
+
+            <a class="botao" href="{{ url_for('equipamentos') }}">
+                Gerenciar equipamentos →
+            </a>
+        </article>
+    </section>
+
+    <section class="cartao" style="margin-top: 22px;">
+        <h2>Central de gerenciamento</h2>
+        <p>
+            O NetLab utiliza um catálogo de fabricantes e modelos para apoiar
+            o inventário dos dispositivos da infraestrutura.
+        </p>
+        <p style="color: var(--texto-suave);">
+            Próximo objetivo: consolidar o cadastro de equipamentos e suas características técnicas.
+        </p>
+    </section>
+</main>
+
+<footer class="rodape">
+    NetLab · Sistema de gerenciamento de infraestrutura de redes
+</footer>
+
 </body>
 </html>
->>>>>>> cc53c3a2e06f30346f18496c7ee81a968fcaab58

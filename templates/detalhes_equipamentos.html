@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do equipamento | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+    </nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>{{ equipamento.nome }}</h1>
+        <p>Informações e especificações do dispositivo cadastrado.</p>
+    </section>
+
+    <section class="grade">
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Informações gerais</h2>
+                <span class="etiqueta">ID: {{ equipamento.id }}</span>
+            </div>
+
+            <div class="lista-regioes">
+                <p>
+                    <strong>Nome:</strong>
+                    {{ equipamento.nome }}
+                </p>
+
+                <p>
+                    <strong>Tipo:</strong>
+                    {{ equipamento.tipo }}
+                </p>
+
+                <p>
+                    <strong>Região:</strong>
+                    {{ equipamento.regiao.nome if equipamento.regiao else 'Não definida' }}
+                </p>
+
+                <p>
+                    <strong>Fabricante:</strong>
+                    {{ equipamento.fabricante.nome if equipamento.fabricante else 'Não informado' }}
+                </p>
+
+                <p>
+                    <strong>Modelo:</strong>
+                    {% if equipamento.modelo %}
+                        {{ equipamento.modelo.modelo }}
+                    {% else %}
+                        Não informado
+                    {% endif %}
+                </p>
+            </div>
+        </article>
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Especificações do modelo</h2>
+            </div>
+
+            {% if equipamento.modelo %}
+                <div class="lista-regioes">
+
+                    {% if equipamento.modelo.fabricante %}
+                        <p>
+                            <strong>Fabricante do modelo:</strong>
+                            {{ equipamento.modelo.fabricante.nome }}
+                        </p>
+                    {% endif %}
+
+                    {% if equipamento.modelo.modelo %}
+                        <p>
+                            <strong>Modelo:</strong>
+                            {{ equipamento.modelo.modelo }}
+                        </p>
+                    {% endif %}
+
+                    {% if equipamento.modelo.descricao %}
+                        <p>
+                            <strong>Descrição:</strong>
+                            {{ equipamento.modelo.descricao }}
+                        </p>
+                    {% endif %}
+
+                    {% if equipamento.modelo.part_number %}
+                        <p>
+                            <strong>Part number:</strong>
+                            {{ equipamento.modelo.part_number }}
+                        </p>
+                    {% endif %}
+
+                    {% if equipamento.modelo.u_height is not none %}
+                        <p>
+                            <strong>Altura em rack:</strong>
+                            {{ equipamento.modelo.u_height }} U
+                        </p>
+                    {% endif %}
+
+                    {% if equipamento.modelo.is_full_depth is not none %}
+                        <p>
+                            <strong>Profundidade completa:</strong>
+                            {{ 'Sim' if equipamento.modelo.is_full_depth else 'Não' }}
+                        </p>
+                    {% endif %}
+
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhum modelo foi associado a este equipamento.</p>
+                    <p>Você pode consultar os dados gerais acima.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    {% if equipamento.modelo %}
+        <section class="cartao" style="margin-top: 24px;">
+            <div class="cabecalho-cartao">
+                <h2>Interfaces de rede</h2>
+                <span class="etiqueta">
+                    {{ equipamento.modelo.interfaces|length }} interfaces
+                </span>
+            </div>
+
+            {% if equipamento.modelo.interfaces %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interface in equipamento.modelo.interfaces %}
+                                <tr>
+                                    <td>{{ interface.nome }}</td>
+                                    <td>{{ interface.tipo }}</td>
+                                    <td>{{ interface.descricao or '—' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Este modelo não possui interfaces cadastradas.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="cartao" style="margin-top: 24px;">
+            <div class="cabecalho-cartao">
+                <h2>Portas de alimentação</h2>
+                <span class="etiqueta">
+                    {{ equipamento.modelo.portas_alimentacao|length }} portas
+                </span>
+            </div>
+
+            {% if equipamento.modelo.portas_alimentacao %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for porta in equipamento.modelo.portas_alimentacao %}
+                                <tr>
+                                    <td>{{ porta.nome }}</td>
+                                    <td>{{ porta.tipo }}</td>
+                                    <td>{{ porta.descricao or '—' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Este modelo não possui portas de alimentação cadastradas.</p>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    <div class="acoes" style="margin-top: 24px;">
+        <a class="botao botao-secundario"
+           href="{{ url_for('equipamentos') }}">
+            ← Voltar aos equipamentos
+        </a>
+
+        <a class="botao botao-secundario"
+           href="{{ url_for('index') }}">
+            Início
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Detalhes do equipamento
+</footer>
+
+</body>
+</html>
