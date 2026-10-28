@@ -204,17 +204,27 @@
         </section>
     {% endif %}
 
-    <div class="acoes" style="margin-top: 24px;">
-        <a class="botao botao-secundario"
-           href="{{ url_for('equipamentos') }}">
-            ← Voltar aos equipamentos
-        </a>
 
-        <a class="botao botao-secundario"
-           href="{{ url_for('index') }}">
-            Início
-        </a>
-    </div>
+<div class="acoes acoes-detalhes">
+
+    <a class="botao botao-principal"
+       href="{{ url_for('portas_equipamento', equipamento_id=equipamento.id) }}">
+        <span>Portas e conexões</span>
+        <span aria-hidden="true">→</span>
+    </a>
+
+    <a class="botao botao-secundario"
+       href="{{ url_for('equipamentos') }}">
+        ← Voltar aos equipamentos
+    </a>
+
+    <a class="botao botao-secundario"
+       href="{{ url_for('index') }}">
+        Início
+    </a>
+
+</div>
+
 
 </main>
 

@@ -1,22 +1,32 @@
 
 /* =========================================
-   NetLab — Identidade visual principal
+   NETLAB — NEON DISTRICT
+   Identidade visual cyberpunk
    ========================================= */
 
 :root {
     color-scheme: dark;
-    --fundo: #0b1120;
-    --painel: #111b2e;
-    --painel-secundario: #17243a;
-    --borda: #293950;
-    --texto: #e8eef8;
-    --texto-suave: #91a2bb;
-    --azul: #3984f6;
-    --azul-hover: #5797ff;
-    --verde: #32c48d;
-    --vermelho: #f16b76;
-    --raio: 12px;
-    --sombra: 0 12px 32px rgba(0, 0, 0, 0.18);
+
+    --fundo: #08090d;
+    --painel: #111319;
+    --painel-secundario: #191c24;
+    --borda: #30333b;
+
+    --texto: #f3f3ed;
+    --texto-suave: #a2a5b0;
+
+    --amarelo: #fcee0a;
+    --amarelo-hover: #fff94d;
+    --ciano: #00eaff;
+    --magenta: #ff2e74;
+
+    --azul: var(--amarelo);
+    --azul-hover: var(--amarelo-hover);
+    --verde: #43f5a6;
+    --vermelho: #ff426b;
+
+    --raio: 4px;
+    --sombra: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -31,22 +41,35 @@ html {
 body {
     margin: 0;
     min-height: 100vh;
+
     background:
-        radial-gradient(ellipse at top left, #152744 0%, transparent 42%),
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        radial-gradient(ellipse at 50% -15%, #252316 0%, transparent 48%),
         var(--fundo);
+
+    background-size: 32px 32px, 32px 32px, auto, auto;
+
     color: var(--texto);
     font-family: "Segoe UI", Arial, sans-serif;
     font-size: 15px;
     line-height: 1.6;
 }
 
+::selection {
+    background: var(--amarelo);
+    color: #08090d;
+}
+
 a {
-    color: #76adff;
+    color: var(--ciano);
     text-decoration: none;
+    transition: color 0.18s, text-shadow 0.18s;
 }
 
 a:hover {
-    color: var(--azul-hover);
+    color: #a1f8ff;
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.3);
 }
 
 button,
@@ -62,21 +85,40 @@ button,
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: var(--azul);
-    color: white;
-    font-weight: 600;
+
+    padding: 10px 17px;
+
+    border: 1px solid var(--amarelo);
+    border-radius: var(--raio);
+
+    background: var(--amarelo);
+    color: #090a0d;
+
+    font-weight: 800;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+
+    transition:
+        background 0.18s,
+        border-color 0.18s,
+        box-shadow 0.18s,
+        transform 0.18s;
 }
 
 button:hover,
 .botao:hover {
-    background: var(--azul-hover);
-    color: white;
+    background: var(--amarelo-hover);
+    border-color: var(--amarelo-hover);
+    color: #090a0d;
+
+    box-shadow: 0 0 16px rgba(252, 238, 10, 0.18);
     transform: translateY(-1px);
+}
+
+button:focus-visible,
+.botao:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--ciano);
+    outline-offset: 3px;
 }
 
 .botao-secundario {
@@ -86,36 +128,59 @@ button:hover,
 }
 
 .botao-secundario:hover {
-    background: #22334e;
+    background: #252832;
+    border-color: var(--ciano);
+    color: var(--ciano);
 }
 
 .botao-perigo {
-    background: #652b38;
-    color: #ffdce0;
+    background: #35151f;
+    border-color: var(--magenta);
+    color: #ffb6cc;
 }
 
 .botao-perigo:hover {
-    background: #873447;
+    background: #551b2d;
+    border-color: #ff729d;
+    color: white;
+    box-shadow: 0 0 14px rgba(255, 46, 116, 0.2);
 }
 
 input,
 select,
 textarea {
     width: 100%;
+    min-width: 0;
     padding: 11px 12px;
+
     color: var(--texto);
-    background: #0c1628;
-    border: 1px solid var(--borda);
-    border-radius: 8px;
+    background: #0b0d12;
+
+    border: 1px solid #363944;
+    border-radius: var(--raio);
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+
+    transition:
+        border-color 0.18s,
+        box-shadow 0.18s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: #555a68;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: var(--azul);
-    box-shadow: 0 0 0 3px rgba(57, 132, 246, 0.16);
+    border-color: var(--ciano);
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.12);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #737783;
 }
 
 select option {
@@ -131,9 +196,9 @@ textarea {
 label {
     display: block;
     margin-bottom: 6px;
-    color: #c8d5e8;
+    color: #d5d6dc;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 form {
@@ -152,53 +217,87 @@ form {
 }
 
 .cabecalho {
+    position: relative;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
+
     padding: 18px 5%;
-    background: rgba(12, 22, 40, 0.92);
-    border-bottom: 1px solid var(--borda);
+
+    background: rgba(12, 13, 18, 0.96);
+    border-bottom: 1px solid #414027;
+}
+
+.cabecalho::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 5%;
+
+    width: 110px;
+    height: 2px;
+
+    background: var(--amarelo);
+    box-shadow: 0 0 10px rgba(252, 238, 10, 0.35);
 }
 
 .marca {
     display: flex;
     align-items: center;
     gap: 12px;
+
     color: var(--texto);
     font-size: 21px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
 }
 
 .marca-simbolo {
     display: grid;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     place-items: center;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #3984f6, #2855bc);
-    color: white;
+
+    border-radius: 3px;
+    background: var(--amarelo);
+    color: #08090d;
+
     font-weight: 900;
+
+    clip-path: polygon(
+        0 0, 100% 0, 100% 76%,
+        76% 100%, 0 100%
+    );
 }
 
 .navegacao {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .navegacao a {
     padding: 8px 12px;
-    border-radius: 8px;
+
+    border: 1px solid transparent;
+    border-radius: 2px;
+
     color: var(--texto-suave);
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .navegacao a:hover,
 .navegacao a.ativo {
-    background: #1a2c47;
-    color: white;
+    background: rgba(252, 238, 10, 0.07);
+    border-color: rgba(252, 238, 10, 0.35);
+    color: var(--amarelo);
+    text-shadow: 0 0 8px rgba(252, 238, 10, 0.15);
 }
 
 .conteudo {
@@ -208,13 +307,18 @@ form {
 
 .titulo-pagina {
     margin-bottom: 28px;
+    padding-left: 16px;
+    border-left: 3px solid var(--amarelo);
 }
 
 .titulo-pagina h1 {
     margin: 0 0 6px;
-    font-size: clamp(26px, 4vw, 34px);
+
+    color: var(--texto);
+    font-size: clamp(26px, 4vw, 36px);
     line-height: 1.25;
-    letter-spacing: -0.7px;
+    letter-spacing: -0.6px;
+    text-transform: uppercase;
 }
 
 .titulo-pagina p {
@@ -229,17 +333,37 @@ form {
 }
 
 .cartao {
+    position: relative;
     min-width: 0;
     padding: 24px;
-    background: linear-gradient(145deg, #142139, #101a2b);
+
+    background: linear-gradient(145deg, #15171e, #101116);
     border: 1px solid var(--borda);
     border-radius: var(--raio);
+
     box-shadow: var(--sombra);
+}
+
+.cartao::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 18px;
+
+    width: 44px;
+    height: 2px;
+
+    background: var(--ciano);
+    opacity: 0.8;
 }
 
 .cartao h2,
 .cartao h3 {
     margin-top: 0;
+}
+
+.cartao h2 {
+    color: var(--texto);
 }
 
 .cabecalho-cartao {
@@ -265,28 +389,34 @@ form {
 .mensagem {
     margin-bottom: 20px;
     padding: 13px 16px;
+
     border: 1px solid var(--borda);
-    border-radius: 9px;
+    border-left: 3px solid var(--ciano);
+    border-radius: var(--raio);
+
     background: var(--painel);
 }
 
 .mensagem.sucesso {
-    border-color: #246b55;
-    background: #102c29;
-    color: #8de7c5;
+    border-color: #245e49;
+    border-left-color: var(--verde);
+    background: #101e1a;
+    color: #9cf8ce;
 }
 
 .mensagem.erro {
-    border-color: #773644;
-    background: #321b28;
-    color: #ffb5bf;
+    border-color: #6e2940;
+    border-left-color: var(--magenta);
+    background: #26131b;
+    color: #ffb6cc;
 }
 
 .tabela-conteiner {
     width: 100%;
     overflow-x: auto;
+
     border: 1px solid var(--borda);
-    border-radius: 10px;
+    border-radius: var(--raio);
 }
 
 table {
@@ -296,25 +426,30 @@ table {
 }
 
 thead {
-    background: #1a2940;
+    background: #1b1d24;
 }
 
 th,
 td {
     padding: 13px 16px;
-    border-bottom: 1px solid var(--borda);
+    border-bottom: 1px solid #292c34;
     vertical-align: middle;
 }
 
 th {
-    color: #b9c9df;
-    font-size: 12px;
+    color: var(--amarelo);
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.9px;
+    white-space: nowrap;
 }
 
 td {
-    color: #dbe5f3;
+    color: #dfe0e5;
+}
+
+tbody tr {
+    transition: background 0.15s;
 }
 
 tbody tr:last-child td {
@@ -322,7 +457,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-    background: rgba(58, 92, 140, 0.12);
+    background: rgba(0, 234, 255, 0.035);
 }
 
 .lista-vazia {
@@ -334,12 +469,17 @@ tbody tr:hover {
 .etiqueta {
     display: inline-block;
     padding: 4px 9px;
-    border: 1px solid var(--borda);
-    border-radius: 20px;
-    background: #1a2a42;
-    color: #c9dcf7;
-    font-size: 12px;
-    font-weight: 600;
+
+    border: 1px solid #3c414d;
+    border-radius: 2px;
+
+    background: #1a1c24;
+    color: #d9dbe2;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
 }
 
 .separador {
@@ -354,7 +494,50 @@ tbody tr:hover {
     border-top: 1px solid var(--borda);
     color: var(--texto-suave);
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
+}
+
+/* Compatibilidade com páginas antigas */
+
+.container {
+    width: min(1180px, 92%);
+    margin: 32px auto 60px;
+}
+
+.card {
+    position: relative;
+    min-width: 0;
+    margin-bottom: 22px;
+    padding: 24px;
+
+    background: linear-gradient(145deg, #15171e, #101116);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra);
+}
+
+.card h2 {
+    margin-top: 0;
+    color: var(--texto);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.cabecalho-secao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--borda);
+    margin: 22px 0;
 }
 
 @media (max-width: 760px) {
@@ -368,7 +551,8 @@ tbody tr:hover {
         width: 100%;
     }
 
-    .conteudo {
+    .conteudo,
+    .container {
         width: 94%;
         margin-top: 24px;
     }
@@ -377,12 +561,387 @@ tbody tr:hover {
         grid-template-columns: 1fr;
     }
 
-    .cartao {
+    .cartao,
+    .card {
         padding: 18px;
     }
 
-    .cabecalho-cartao {
+    .cabecalho-cartao,
+    .cabecalho-secao {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    th,
+    td {
+        padding: 11px 12px;
+    }
+
+    button,
+    .botao {
+        max-width: 100%;
+    }
+}
+
+
+/* Ajustes da tabela de equipamentos */
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+.table-responsive table {
+    width: 100%;
+    min-width: 620px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.table-responsive th,
+.table-responsive td {
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    padding: 14px 12px;
+}
+
+.table-responsive th:last-child,
+.table-responsive td:last-child {
+    width: 120px;
+}
+
+.table-responsive td button,
+.table-responsive td a {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Correção da tabela de equipamentos do NetLab */
+.tabela-responsiva {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+.tabela-responsiva table {
+    width: 100%;
+    min-width: 600px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.tabela-responsiva th,
+.tabela-responsiva td {
+    padding: 14px 10px;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.tabela-responsiva th:nth-child(1),
+.tabela-responsiva td:nth-child(1) {
+    width: 16%;
+}
+
+.tabela-responsiva th:nth-child(2),
+.tabela-responsiva td:nth-child(2) {
+    width: 15%;
+}
+
+.tabela-responsiva th:nth-child(3),
+.tabela-responsiva td:nth-child(3) {
+    width: 16%;
+}
+
+.tabela-responsiva th:nth-child(4),
+.tabela-responsiva td:nth-child(4) {
+    width: 33%;
+}
+
+.tabela-responsiva th:nth-child(5),
+.tabela-responsiva td:nth-child(5) {
+    width: 20%;
+}
+
+.tabela-responsiva td .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 10px 12px;
+}
+
+
+/* Navegação e informações da página de portas */
+.caminho-pagina {
+    margin: 0 0 24px;
+    color: var(--texto-suave);
+    font-size: 0.9rem;
+}
+
+.caminho-pagina a {
+    color: var(--ciano);
+    text-decoration: none;
+}
+
+.caminho-pagina a:hover {
+    color: var(--amarelo);
+}
+
+.grade-informacoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px 24px;
+}
+
+.grade-informacoes p {
+    overflow-wrap: anywhere;
+}
+
+.acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.acoes form {
+    margin: 0;
+}
+
+.etiqueta.conectado {
+    color: var(--ciano);
+    border-color: var(--ciano);
+}
+
+.etiqueta.disponivel {
+    color: var(--verde);
+    border-color: var(--verde);
+}
+
+.botao-perigo {
+    background: transparent;
+    color: var(--vermelho);
+    border: 1px solid var(--vermelho);
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.botao-perigo:hover {
+    background: var(--vermelho);
+    color: var(--fundo);
+}
+
+
+
+/* Ações dos detalhes do equipamento */
+.acoes-detalhes {
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 24px;
+    gap: 12px;
+}
+
+.acoes-detalhes .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 44px;
+    text-decoration: none;
+}
+
+/* Botão principal de navegação */
+.botao-principal {
+    background: var(--amarelo);
+    color: #08090d;
+    border: 1px solid var(--amarelo);
+    padding: 12px 18px;
+    font-weight: 700;
+}
+
+.botao-principal:hover {
+    background: var(--amarelo-hover);
+    border-color: var(--amarelo-hover);
+    color: #08090d;
+}
+
+@media (max-width: 600px) {
+    .acoes-detalhes {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .acoes-detalhes .botao {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+
+/* Alinhamento das ações na tabela de portas */
+.tabela-responsiva td:last-child {
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.tabela-responsiva td:last-child form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.tabela-responsiva td:last-child .botao,
+.tabela-responsiva td:last-child button,
+.tabela-responsiva td:last-child > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+/* Mantém a coluna de ações com espaço suficiente */
+.tabela-responsiva table th:last-child,
+.tabela-responsiva table td:last-child {
+    width: 160px;
+}
+
+/* Evita que formulários alterem a altura das linhas */
+.tabela-responsiva td:last-child form button {
+    flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+    .tabela-responsiva td:last-child,
+    .tabela-responsiva th:last-child {
+        width: 145px;
+    }
+}
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================
+   NETLAB - AJUSTES DA TABELA DE PORTAS
+   ========================================= */
+
+.tabela-portas {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.tabela-portas th,
+.tabela-portas td {
+    vertical-align: middle;
+}
+
+/* Coluna das ações */
+.tabela-portas th.coluna-acoes-porta,
+.tabela-portas td.coluna-acoes-porta {
+    width: 150px;
+    min-width: 150px;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Formulário de desconexão */
+.tabela-portas .formulario-acao-porta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Botões de conectar e desconectar */
+.tabela-portas .botao-acao-porta {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 125px;
+    min-height: 34px;
+    margin: 0;
+    padding: 7px 10px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Botão conectar */
+.tabela-portas .botao-conectar {
+    color: #ffffff;
+    background: #087f8c;
+    border-color: #10b7c4;
+}
+
+/* Botão desconectar */
+.tabela-portas .botao-desconectar {
+    color: #ffffff;
+    background: #a82b40;
+    border-color: #ed5269;
+}
+
+/* Efeito ao passar o mouse */
+.tabela-portas .botao-acao-porta:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+/* Texto para portas desabilitadas */
+.tabela-portas .acao-indisponivel {
+    display: inline-block;
+    color: #999999;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 700px) {
+    .tabela-portas th.coluna-acoes-porta,
+    .tabela-portas td.coluna-acoes-porta {
+        width: 140px;
+        min-width: 140px;
+        padding: 6px;
+    }
+
+    .tabela-portas .botao-acao-porta {
+        width: 120px;
+        min-height: 32px;
+        font-size: 11px;
     }
 }

@@ -39,6 +39,7 @@
 
     <section class="grade">
 
+        <!-- FORMULÁRIO DE CADASTRO -->
         <article class="cartao">
             <div class="cabecalho-cartao">
                 <h2>Novo equipamento</h2>
@@ -106,6 +107,7 @@
                     <select id="modelo_id" name="modelo_id" disabled>
                         <option value="">Selecione primeiro um fabricante</option>
                     </select>
+
                     <small style="color: var(--texto-suave);">
                         Os modelos serão carregados conforme o fabricante selecionado.
                     </small>
@@ -115,12 +117,73 @@
             </form>
         </article>
 
+        <!-- LISTA E FILTRO DE EQUIPAMENTOS -->
         <article class="cartao">
+
             <div class="cabecalho-cartao">
                 <h2>Equipamentos cadastrados</h2>
-                <span class="etiqueta">{{ equipamentos|length }} registrados</span>
+                <span class="etiqueta">
+                    {{ equipamentos|length }}
+                    {% if equipamentos|length == 1 %}
+                        registrado
+                    {% else %}
+                        registrados
+                    {% endif %}
+                </span>
             </div>
 
+            <!-- BOTÃO PARA MOSTRAR OU OCULTAR O FILTRO -->
+            <div style="margin-bottom: 18px;">
+                <button
+                    type="button"
+                    id="botao-filtro-regiao"
+                    class="botao botao-secundario"
+                    aria-expanded="false"
+                    aria-controls="form-filtro-regioes"
+                >
+                    Filtrar por região
+                </button>
+            </div>
+
+            <!-- FORMULÁRIO DE FILTRO -->
+            <form
+                id="form-filtro-regioes"
+                method="GET"
+                action="{{ url_for('equipamentos') }}"
+                class="formulario"
+                hidden
+                style="margin-bottom: 24px;"
+            >
+                <div class="campo">
+                    <label for="filtro_regiao_id">Selecione uma região</label>
+
+                    <select id="filtro_regiao_id" name="filtro_regiao_id">
+                        <option value="">Todas as regiões</option>
+
+                        {% for regiao in regioes %}
+                            <option
+                                value="{{ regiao.id }}"
+                                {% if filtro_regiao_id == regiao.id %}selected{% endif %}
+                            >
+                                {{ regiao.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="acoes">
+                    <button type="submit">Aplicar filtro</button>
+
+                    <a
+                        class="botao botao-secundario"
+                        href="{{ url_for('equipamentos') }}"
+                    >
+                        Limpar filtro
+                    </a>
+                </div>
+            </form>
+
+            <!-- TABELA DE EQUIPAMENTOS -->
             {% if equipamentos %}
                 <div class="tabela-responsiva">
                     <table>
@@ -133,15 +196,21 @@
                                 <th>Ação</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for equipamento in equipamentos %}
                                 <tr>
-                                    <td><strong>{{ equipamento.nome }}</strong></td>
+                                    <td>
+                                        <strong>{{ equipamento.nome }}</strong>
+                                    </td>
+
                                     <td>{{ equipamento.tipo }}</td>
+
                                     <td>
                                         {{ equipamento.regiao.nome
                                            if equipamento.regiao else 'Não definida' }}
                                     </td>
+
                                     <td>
                                         {% if equipamento.fabricante %}
                                             {{ equipamento.fabricante.nome }}
@@ -154,9 +223,12 @@
                                             <small>{{ equipamento.modelo.modelo }}</small>
                                         {% endif %}
                                     </td>
+
                                     <td>
-                                        <a class="botao botao-secundario"
-                                           href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+                                        <a
+                                            class="botao botao-secundario"
+                                            href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}"
+                                        >
                                             Detalhes
                                         </a>
                                     </td>
@@ -167,10 +239,16 @@
                 </div>
             {% else %}
                 <div class="lista-vazia">
-                    <p>Nenhum equipamento cadastrado.</p>
-                    <p>Use o formulário para adicionar o primeiro dispositivo.</p>
+                    {% if filtro_regiao_id %}
+                        <p>Nenhum equipamento encontrado nesta região.</p>
+                        <p>Experimente selecionar outra região ou limpar o filtro.</p>
+                    {% else %}
+                        <p>Nenhum equipamento cadastrado.</p>
+                        <p>Use o formulário para adicionar o primeiro dispositivo.</p>
+                    {% endif %}
                 </div>
             {% endif %}
+
         </article>
 
     </section>
@@ -188,9 +266,11 @@
 </footer>
 
 <script>
+    // Seletores do cadastro de fabricante e modelo
     const seletorFabricante = document.getElementById("fabricante_id");
     const seletorModelo = document.getElementById("modelo_id");
 
+    // Carrega os modelos conforme o fabricante selecionado
     seletorFabricante.addEventListener("change", async function () {
         const fabricanteId = this.value;
 
@@ -201,6 +281,7 @@
                 "Selecione primeiro um fabricante",
                 ""
             ));
+
             seletorModelo.disabled = true;
             return;
         }
@@ -244,6 +325,26 @@
         } finally {
             seletorModelo.disabled = false;
         }
+    });
+
+    // Mostrar e ocultar o filtro por região
+    const botaoFiltroRegiao = document.getElementById(
+        "botao-filtro-regiao"
+    );
+
+    const formularioFiltroRegiao = document.getElementById(
+        "form-filtro-regioes"
+    );
+
+    botaoFiltroRegiao.addEventListener("click", function () {
+        const estaOculto = formularioFiltroRegiao.hidden;
+
+        formularioFiltroRegiao.hidden = !estaOculto;
+
+        botaoFiltroRegiao.setAttribute(
+            "aria-expanded",
+            String(estaOculto)
+        );
     });
 </script>
 

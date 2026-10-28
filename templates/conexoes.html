@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexões - NetLab</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+<body>
+    <header>
+        <h1>Conexões físicas</h1>
+        <p>Gerencie os cabos entre os equipamentos do NetLab.</p>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Conectar duas portas</h2>
+
+            <form method="POST" action="{{ url_for('conexoes') }}">
+                <label for="interface_origem_id">Porta de origem</label>
+                <select
+                    id="interface_origem_id"
+                    name="interface_origem_id"
+                    required
+                >
+                    <option value="">Selecione uma porta</option>
+                    {% for porta in portas %}
+                        <option value="{{ porta.id }}">
+                            {{ porta.equipamento.nome }} —
+                            {{ porta.nome }} ({{ porta.tipo }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="interface_destino_id">Porta de destino</label>
+                <select
+                    id="interface_destino_id"
+                    name="interface_destino_id"
+                    required
+                >
+                    <option value="">Selecione uma porta</option>
+                    {% for porta in portas %}
+                        <option value="{{ porta.id }}">
+                            {{ porta.equipamento.nome }} —
+                            {{ porta.nome }} ({{ porta.tipo }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="tipo_cabo">Tipo de cabo</label>
+                <select id="tipo_cabo" name="tipo_cabo" required>
+                    <option value="Ethernet">Ethernet</option>
+                    <option value="Fibra óptica">Fibra óptica</option>
+                    <option value="DAC">DAC</option>
+                    <option value="Outro">Outro</option>
+                </select>
+
+                <label for="descricao">Descrição (opcional)</label>
+                <input
+                    type="text"
+                    id="descricao"
+                    name="descricao"
+                    maxlength="250"
+                    placeholder="Ex.: PC1 ligado à porta 2 do Switch1"
+                >
+
+                <button type="submit">Registrar conexão</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Conexões cadastradas</h2>
+
+            {% if conexoes %}
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Origem</th>
+                                <th>Destino</th>
+                                <th>Cabo</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conexao in conexoes %}
+                                <tr>
+                                    <td>
+                                        {{ conexao.interface_origem.equipamento.nome }}
+                                        — {{ conexao.interface_origem.nome }}
+                                    </td>
+                                    <td>
+                                        {{ conexao.interface_destino.equipamento.nome }}
+                                        — {{ conexao.interface_destino.nome }}
+                                    </td>
+                                    <td>{{ conexao.tipo_cabo }}</td>
+                                    <td>{{ conexao.descricao or "—" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Nenhuma conexão cadastrada ainda.</p>
+            {% endif %}
+        </section>
+
+        <p>
+            <a href="{{ url_for('equipamentos') }}">
+                Voltar para equipamentos
+            </a>
+        </p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ equipamento.nome }} | Portas | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+    </nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>{{ equipamento.nome }}</h1>
+        <p>Interfaces e conexões físicas da infraestrutura de rede.</p>
+    </section>
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('equipamentos') }}">Equipamentos</a> /
+        <a href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+            {{ equipamento.nome }}
+        </a>
+        / Portas
+    </p>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao">
+        <div class="cabecalho-cartao">
+            <h2>Informações do equipamento</h2>
+            <span class="etiqueta">{{ equipamento.tipo }}</span>
+        </div>
+
+        <div class="grade-informacoes">
+            <p><strong>Nome:</strong> {{ equipamento.nome }}</p>
+            <p><strong>Tipo:</strong> {{ equipamento.tipo }}</p>
+
+            {% if equipamento.regiao %}
+                <p><strong>Região:</strong> {{ equipamento.regiao.nome }}</p>
+            {% endif %}
+
+            {% if equipamento.fabricante %}
+                <p><strong>Fabricante:</strong> {{ equipamento.fabricante.nome }}</p>
+            {% endif %}
+
+            {% if equipamento.modelo %}
+                <p><strong>Modelo:</strong> {{ equipamento.modelo.modelo }}</p>
+            {% endif %}
+        </div>
+
+        <div class="acoes">
+            <a class="botao botao-secundario"
+               href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+                Voltar aos detalhes
+            </a>
+
+            <a class="botao botao-secundario"
+               href="{{ url_for('equipamentos') }}">
+                Todos os equipamentos
+            </a>
+        </div>
+    </section>
+
+    <section class="cartao">
+        <div class="cabecalho-cartao">
+            <h2>Portas e interfaces</h2>
+            <span class="etiqueta">{{ portas|length }} interfaces</span>
+        </div>
+
+        {% if portas %}
+            <div class="tabela-responsiva">
+                <table class="tabela-portas">
+                    <thead>
+                        <tr>
+                            <th>Interface</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Conectada a</th>
+                            <th class="coluna-acoes-porta">Ação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for porta in portas %}
+                            <tr>
+                                <td>
+                                    <strong>{{ porta.nome }}</strong>
+                                </td>
+
+                                <td>{{ porta.tipo }}</td>
+
+                                <td>
+                                    {% if not porta.habilitada %}
+                                        <span class="etiqueta">Desabilitada</span>
+                                    {% elif porta.id in portas_conectadas %}
+                                        <span class="etiqueta conectado">Conectada</span>
+                                    {% else %}
+                                        <span class="etiqueta disponivel">Disponível</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if porta.id in conexoes_portas %}
+                                        <strong>
+                                            {{ conexoes_portas[porta.id].equipamento }}
+                                        </strong>
+                                        <br>
+                                        <small>
+                                            {{ conexoes_portas[porta.id].porta }}
+                                        </small>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <td class="coluna-acoes-porta">
+                                    {% if porta.id in conexoes_portas %}
+
+                                        <form
+                                            class="formulario-acao-porta"
+                                            method="POST"
+                                            action="{{ url_for('desconectar_cabo', conexao_id=conexoes_portas[porta.id].id) }}"
+                                            onsubmit="return confirm('Deseja realmente desconectar este cabo?');"
+                                        >
+                                            <button type="submit"
+                                                    class="botao-acao-porta botao-desconectar">
+                                                Desconectar
+                                            </button>
+                                        </form>
+
+                                    {% elif porta.habilitada %}
+
+                                        <a class="botao-acao-porta botao-conectar"
+                                           href="{{ url_for('nova_conexao', interface_id=porta.id) }}">
+                                            Conectar cabo
+                                        </a>
+
+                                    {% else %}
+                                        <span class="acao-indisponivel">Indisponível</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+            <div class="lista-vazia">
+                <p>Este equipamento não possui interfaces cadastradas.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <div class="acoes">
+        <a class="botao botao-secundario"
+           href="{{ url_for('equipamentos') }}">
+            ← Voltar para equipamentos
+        </a>
+
+        <a class="botao botao-secundario"
+           href="{{ url_for('index') }}">
+            Ir para o início
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Inventário de equipamentos de rede
+</footer>
+
+</body>
+</html>

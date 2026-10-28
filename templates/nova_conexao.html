@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectar cabo - NetLab</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Conectar cabo</h1>
+        <p>Escolha onde esta porta será conectada.</p>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Porta de origem</h2>
+            <p>
+                <strong>{{ porta_origem.equipamento.nome }}</strong>
+                — {{ porta_origem.nome }}
+            </p>
+            <p>{{ porta_origem.tipo }}</p>
+        </section>
+
+        <section class="card">
+            <h2>Destino</h2>
+
+            <form method="GET"
+                  action="{{ url_for('nova_conexao',
+                                     interface_id=porta_origem.id) }}">
+                <label for="equipamento_destino_id">
+                    Equipamento de destino
+                </label>
+
+                <select id="equipamento_destino_id"
+                        name="equipamento_destino_id"
+                        required>
+                    <option value="">Escolha um equipamento</option>
+
+                    {% for equipamento in equipamentos_destino %}
+                        <option value="{{ equipamento.id }}"
+                            {% if equipamento_destino_id == equipamento.id %}
+                                selected
+                            {% endif %}>
+                            {{ equipamento.nome }} — {{ equipamento.tipo }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Mostrar portas disponíveis</button>
+            </form>
+
+            {% if equipamento_destino_id %}
+                <hr>
+
+                {% if portas_destino %}
+                    <form method="POST"
+                          action="{{ url_for('nova_conexao',
+                                             interface_id=porta_origem.id) }}">
+
+                        <input type="hidden"
+                               name="equipamento_destino_id"
+                               value="{{ equipamento_destino_id }}">
+
+                        <label for="interface_destino_id">
+                            Porta de destino
+                        </label>
+
+                        <select id="interface_destino_id"
+                                name="interface_destino_id" required>
+                            <option value="">Escolha uma porta</option>
+
+                            {% for porta in portas_destino %}
+                                <option value="{{ porta.id }}">
+                                    {{ porta.nome }} — {{ porta.tipo }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="tipo_cabo">Tipo de cabo</label>
+                        <select id="tipo_cabo" name="tipo_cabo" required>
+                            <option value="Ethernet">Ethernet</option>
+                            <option value="Fibra óptica">Fibra óptica</option>
+                            <option value="DAC">DAC</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+
+                        <label for="descricao">Descrição (opcional)</label>
+                        <input type="text" id="descricao" name="descricao"
+                               maxlength="250"
+                               placeholder="Ex.: PC 1 ligado ao Switch">
+
+                        <button type="submit">Conectar cabo</button>
+                    </form>
+                {% else %}
+                    <p>Este equipamento não possui portas disponíveis.</p>
+                {% endif %}
+            {% endif %}
+        </section>
+
+        <p>
+            <a href="{{ url_for('portas_equipamento',
+                               equipamento_id=porta_origem.equipamento_id) }}">
+                Cancelar e voltar
+            </a>
+        </p>
+    </main>
+</body>
+</html>

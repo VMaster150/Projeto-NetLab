@@ -39,6 +39,7 @@
 
     <section class="grade">
 
+        <!-- FORMULÁRIO DE CADASTRO -->
         <article class="cartao">
             <div class="cabecalho-cartao">
                 <h2>Nova região</h2>
@@ -79,6 +80,7 @@
                             </option>
                         {% endfor %}
                     </select>
+
                     <small style="color: var(--texto-suave);">
                         Selecione uma região para criar uma sub-região.
                     </small>
@@ -88,65 +90,146 @@
             </form>
         </article>
 
+        <!-- ORGANIZAÇÃO DAS REGIÕES -->
         <article class="cartao">
+
             <div class="cabecalho-cartao">
                 <h2>Organização das regiões</h2>
                 <span class="etiqueta">{{ regioes|length }} cadastradas</span>
             </div>
 
+            <!-- BOTÃO PARA ABRIR O FILTRO -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <button
+                    type="button"
+                    class="botao botao-secundario"
+                    onclick="alternarFiltroRegioes()"
+aria-expanded="{{ 'true' if filtro_regiao_id else 'false' }}"                    aria-controls="form-filtro-regioes">
+                    Filtrar regiões
+                </button>
+            </div>
+
+            <!-- FORMULÁRIO DE PESQUISA -->
+
+<form
+    id="form-filtro-regioes"
+    method="GET"
+    action="{{ url_for('regiao') }}"
+    style="display: {{ 'block' if filtro_regiao_id else 'none' }}; margin-bottom: 20px;">
+
+    <div class="campo">
+        <label for="filtro_regiao_id">Selecione uma região</label>
+
+        <select id="filtro_regiao_id" name="filtro_regiao_id">
+            <option value="">Todas as regiões</option>
+
+            {% for regiao_item in regioes_para_selecao %}
+                <option
+                    value="{{ regiao_item.id }}"
+                    {% if filtro_regiao_id == regiao_item.id %}selected{% endif %}>
+                    {{ "-- " * regiao_item.nivel }}{{ regiao_item.nome }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="acoes">
+        <button type="submit">Aplicar filtro</button>
+
+        <a
+            class="botao botao-secundario"
+            href="{{ url_for('regiao') }}">
+            Limpar filtro
+        </a>
+    </div>
+</form>
+
+
             {% if regioes_principais %}
+
                 <div class="lista-regioes">
+
                     {% macro exibir_regiao(item, nivel=0) %}
-                        <div style="margin-left: {{ nivel * 18 }}px; padding: 12px 0; border-bottom: 1px solid var(--borda);">
-                            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                <div>
-                                    <strong>{{ item.nome }}</strong>
 
-                                    {% if nivel == 0 %}
-                                        <span class="etiqueta">Principal</span>
-                                    {% else %}
-                                        <span class="etiqueta">Sub-região</span>
-                                    {% endif %}
+                        {% set exibir_item = not pesquisa or item.id in ids_regioes_visiveis %}
 
-                                    {% if item.descricao %}
-                                        <p style="margin: 5px 0 0; color: var(--texto-suave);">
-                                            {{ item.descricao }}
-                                        </p>
-                                    {% endif %}
-                                </div>
+                        {% if exibir_item %}
 
-                                <div class="acoes">
-                                    <a class="botao botao-secundario"
-                                       href="{{ url_for('editar_regiao', id=item.id) }}">
-                                        Editar
-                                    </a>
+                            <div style="margin-left: {{ nivel * 18 }}px; padding: 12px 0; border-bottom: 1px solid var(--borda);">
 
-                                    <form method="POST"
-                                          action="{{ url_for('excluir_regiao', id=item.id) }}"
-                                          onsubmit="return confirm('Deseja realmente excluir esta região?');">
-                                        <button type="submit" class="botao-perigo">
-                                            Excluir
-                                        </button>
-                                    </form>
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+
+                                    <div>
+                                        <strong>{{ item.nome }}</strong>
+
+                                        {% if nivel == 0 %}
+                                            <span class="etiqueta">Principal</span>
+                                        {% else %}
+                                            <span class="etiqueta">Sub-região</span>
+                                        {% endif %}
+
+                                        {% if item.descricao %}
+                                            <p style="margin: 5px 0 0; color: var(--texto-suave);">
+                                                {{ item.descricao }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="acoes">
+
+                                        <a
+                                            class="botao botao-secundario"
+                                            href="{{ url_for('editar_regiao', id=item.id) }}">
+                                            Editar
+                                        </a>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('excluir_regiao', id=item.id) }}"
+                                            onsubmit="return confirm('Deseja realmente excluir esta região?');">
+
+                                            <button type="submit" class="botao-perigo">
+                                                Excluir
+                                            </button>
+
+                                        </form>
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
+
+                        {% endif %}
 
                         {% for filha in item.subregioes|sort(attribute='nome') %}
                             {{ exibir_regiao(filha, nivel + 1) }}
                         {% endfor %}
+
                     {% endmacro %}
 
                     {% for item in regioes_principais|sort(attribute='nome') %}
                         {{ exibir_regiao(item) }}
                     {% endfor %}
+
                 </div>
+
             {% else %}
+
                 <div class="lista-vazia">
-                    <p>Nenhuma região cadastrada.</p>
-                    <p>Cadastre a primeira região usando o formulário.</p>
+
+                    {% if pesquisa %}
+                        <p>Nenhuma região encontrada para "{{ pesquisa }}".</p>
+                        <a class="botao botao-secundario" href="{{ url_for('regiao') }}">
+                            Limpar filtro
+                        </a>
+                    {% else %}
+                        <p>Nenhuma região cadastrada.</p>
+                        <p>Cadastre a primeira região usando o formulário.</p>
+                    {% endif %}
+
                 </div>
+
             {% endif %}
+
         </article>
 
     </section>
@@ -162,6 +245,25 @@
 <footer class="rodape">
     NetLab · Gerenciamento de regiões
 </footer>
+
+<script>
+    function alternarFiltroRegioes() {
+        const formulario = document.getElementById('form-filtro-regioes');
+        const campoPesquisa = document.getElementById('pesquisa');
+        const botao = document.querySelector(
+            '[aria-controls="form-filtro-regioes"]'
+        );
+
+        const estaOculto = formulario.style.display === 'none';
+
+        formulario.style.display = estaOculto ? 'block' : 'none';
+        botao.setAttribute('aria-expanded', String(estaOculto));
+
+        if (estaOculto) {
+            campoPesquisa.focus();
+        }
+    }
+</script>
 
 </body>
 </html>
