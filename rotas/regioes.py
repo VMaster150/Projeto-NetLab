@@ -1,4 +1,4 @@
-
+chat
 @app.route("/regiao", methods=["GET", "POST"])
 def regiao():
     if request.method == "POST":
