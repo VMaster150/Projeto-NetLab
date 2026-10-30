@@ -17,8 +17,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
-        <a href="{{ url_for('regiao') }}">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
     </nav>
 </header>
 
@@ -46,7 +46,7 @@
             </div>
 
             <form method="POST"
-                  action="{{ url_for('equipamentos') }}"
+                  action="{{ url_for('equipamentos.equipamentos') }}"
                   class="formulario">
 
                 <div class="campo">
@@ -149,7 +149,7 @@
             <form
                 id="form-filtro-regioes"
                 method="GET"
-                action="{{ url_for('equipamentos') }}"
+                action="{{ url_for('equipamentos.equipamentos') }}"
                 class="formulario"
                 hidden
                 style="margin-bottom: 24px;"
@@ -176,7 +176,7 @@
 
                     <a
                         class="botao botao-secundario"
-                        href="{{ url_for('equipamentos') }}"
+                        href="{{ url_for('equipamentos.equipamentos') }}"
                     >
                         Limpar filtro
                     </a>
@@ -193,6 +193,7 @@
                                 <th>Tipo</th>
                                 <th>Região</th>
                                 <th>Fabricante / Modelo</th>
+                                <th>Detalhes</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -227,10 +228,21 @@
                                     <td>
                                         <a
                                             class="botao botao-secundario"
-                                            href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}"
+                                            href="{{ url_for('equipamentos.detalhe_equipamento', id=equipamento.id) }}"
                                         >
                                             Detalhes
                                         </a>
+                                    </td>
+
+                                    <td>
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('equipamentos.excluir_equipamento', id=equipamento.id) }}"
+                                            onsubmit="return confirm('Deseja realmente excluir este equipamento e suas conexões?');">
+                                            <button type="submit" class="botao-perigo">
+                                                Excluir
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}

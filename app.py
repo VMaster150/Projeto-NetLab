@@ -1,5 +1,6 @@
 from flask import *
 from config import db
+
 from models.regiao import Regiao
 from models.fabricante import Fabricante
 from models.modelo_equipamento import ModeloEquipamento
@@ -7,10 +8,11 @@ from models.interface_modelo import InterfaceModelo
 from models.porta_alimentacao_modelo import PortaAlimentacaoModelo
 from models.equipamento import Equipamento
 from models.interface_equipamento import InterfaceEquipamento
-from models.modelo_equipamento import ModeloEquipamento
 from models.conexao import Conexao
-from flask import Blueprint
-from rotas.regiao import bp_regioes
+
+from rotas.regioes import bp_regioes
+from rotas.equipamentos import bp_equipamentos
+
 
 app = Flask(__name__)
 
@@ -22,236 +24,29 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+app.register_blueprint(bp_regioes)
+app.register_blueprint(bp_equipamentos)
 
 
-@app.route("/equipamentos", methods=["GET", "POST"])
-def equipamentos():
-    if request.method == "POST":
-        nome = request.form.get("nome", "").strip()
-        tipo = request.form.get("tipo", "").strip()
-        regiao_id = request.form.get("regiao_id", "").strip()
-        fabricante_id = request.form.get("fabricante_id", "").strip()
-        modelo_id = request.form.get("modelo_id", "").strip()
 
-        if not nome or not tipo or not regiao_id:
-            flash(
-                "Preencha o nome, o tipo e a região.",
-                "erro"
-            )
-            return redirect(url_for("equipamentos"))
-
-        try:
-            regiao = db.session.get(Regiao, int(regiao_id))
-
-            if regiao is None:
-                flash("A região selecionada não existe.", "erro")
-                return redirect(url_for("equipamentos"))
-
-            fabricante = None
-            modelo = None
-
-            if fabricante_id:
-                fabricante = db.session.get(
-                    Fabricante, int(fabricante_id)
-                )
-
-                if fabricante is None:
-                    flash("Fabricante não encontrado.", "erro")
-                    return redirect(url_for("equipamentos"))
-
-            if modelo_id:
-                modelo = db.session.get(
-                    ModeloEquipamento, int(modelo_id)
-                )
-
-                if modelo is None:
-                    flash("Modelo não encontrado.", "erro")
-                    return redirect(url_for("equipamentos"))
-
-                if fabricante is None:
-                    fabricante = modelo.fabricante
-                elif modelo.fabricante_id != fabricante.id:
-                    flash(
-                        "O modelo não pertence ao fabricante selecionado.",
-                        "erro"
-                    )
-                    return redirect(url_for("equipamentos"))
-
-            novo_equipamento = Equipamento(
-                nome=nome,
-                tipo=tipo,
-                regiao_id=regiao.id,
-                fabricante_id=fabricante.id if fabricante else None,
-                modelo_id=modelo.id if modelo else None
-            )
-
-            db.session.add(novo_equipamento)
-
-            # Garante que o equipamento receba um ID antes
-            # de criar suas portas.
-            db.session.flush()
-
-            # Cria as portas individuais a partir das interfaces do modelo.
-            if modelo is not None:
-                for interface in modelo.interfaces:
-                    if not interface.habilitada:
-                        continue
-
-                    nova_interface = InterfaceEquipamento(
-                        equipamento_id=novo_equipamento.id,
-                        interface_modelo_id=interface.id,
-                        nome=interface.nome,
-                        tipo=interface.tipo,
-                        habilitada=True
-                    )
-
-                    db.session.add(nova_interface)
-
-            # Salva o equipamento e suas portas na mesma transação.
-            db.session.commit()
-
-            flash(
-                "Equipamento cadastrado com sucesso, incluindo suas interfaces!",
-                "sucesso"
-            )
-            return redirect(url_for("equipamentos"))
-
-        except ValueError:
-            db.session.rollback()
-            flash("Selecione identificadores válidos.", "erro")
-            return redirect(url_for("equipamentos"))
-
-        except Exception:
-            db.session.rollback()
-            app.logger.exception("Erro ao cadastrar equipamento")
-            flash("Não foi possível cadastrar o equipamento.", "erro")
-            return redirect(url_for("equipamentos"))
-
-    # Região selecionada no filtro (GET)
-    filtro_regiao_id = request.args.get(
-        "filtro_regiao_id",
-        type=int
-    )
-
-    # Mantém todas as regiões disponíveis para o cadastro e o filtro
-    regioes = Regiao.query.order_by(Regiao.nome).all()
-
-    fabricantes = Fabricante.query.order_by(
-        Fabricante.nome
-    ).all()
-
-    # Consulta os equipamentos
-    consulta_equipamentos = Equipamento.query
-
-    # Se uma região foi selecionada, filtra por ela
-    if filtro_regiao_id is not None:
-        regiao_filtro = db.session.get(Regiao, filtro_regiao_id)
-
-        if regiao_filtro is None:
-            flash("A região selecionada não existe.", "erro")
-            return redirect(url_for("equipamentos"))
-
-        consulta_equipamentos = consulta_equipamentos.filter_by(
-            regiao_id=filtro_regiao_id
-        )
-
-    equipamentos_cadastrados = (
-        consulta_equipamentos
-        .order_by(Equipamento.nome)
-        .all()
-    )
-
-    return render_template(
-        "equipamentos.html",
-        regioes=regioes,
-        fabricantes=fabricantes,
-        equipamentos=equipamentos_cadastrados,
-        filtro_regiao_id=filtro_regiao_id
-    )
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
-@app.route("/api/fabricantes/<int:fabricante_id>/modelos")
-def modelos_por_fabricante(fabricante_id):
-    fabricante = db.session.get(Fabricante, fabricante_id)
-
-    if fabricante is None:
-        return {"erro": "Fabricante não encontrado."}, 404
-
-    modelos = (
-        ModeloEquipamento.query
-        .filter_by(fabricante_id=fabricante_id)
-        .order_by(ModeloEquipamento.modelo)
-        .all()
-    )
-
-    return {
-        "modelos": [
-            {
-                "id": modelo.id,
-                "nome": modelo.modelo
-            }
-            for modelo in modelos
-        ]
-    }
+@app.route("/teste-banco")
+def teste_banco():
+    try:
+        db.session.execute(db.text("SELECT 1"))
+        return "Conexao com PostgreSQL realizada com sucesso!"
+    except Exception as erro:
+        db.session.rollback()
+        app.logger.exception("Erro ao testar conexão com PostgreSQL")
+        return f"Erro ao conectar com o banco: {erro}", 500
 
 
-@app.route("/equipamentos/<int:id>")
-def detalhe_equipamento(id):
-    equipamento = db.get_or_404(Equipamento, id)
-
-    return render_template(
-        "detalhe_equipamento.html",
-        equipamento=equipamento
-    )
 
 
-@app.route("/equipamentos/<int:equipamento_id>/portas")
-def portas_equipamento(equipamento_id):
-    equipamento = db.session.get(Equipamento, equipamento_id)
-
-    if equipamento is None:
-        flash("Equipamento não encontrado.", "erro")
-        return redirect(url_for("equipamentos"))
-
-    portas = (
-        InterfaceEquipamento.query
-        .filter_by(equipamento_id=equipamento.id)
-        .order_by(InterfaceEquipamento.nome)
-        .all()
-    )
-
-    conexoes_portas = {}
-
-    for porta in portas:
-        conexao = Conexao.query.filter(
-            db.or_(
-                Conexao.interface_origem_id == porta.id,
-                Conexao.interface_destino_id == porta.id
-            )
-        ).first()
-
-        if conexao:
-            if conexao.interface_origem_id == porta.id:
-                outra_porta = conexao.interface_destino
-            else:
-                outra_porta = conexao.interface_origem
-
-            conexoes_portas[porta.id] = {
-                "id": conexao.id,
-                "equipamento": outra_porta.equipamento.nome,
-                "porta": outra_porta.nome,
-                "tipo_cabo": conexao.tipo_cabo
-            }
-
-    portas_conectadas = set(conexoes_portas.keys())
-
-    return render_template(
-        "portas_equipamento.html",
-        equipamento=equipamento,
-        portas=portas,
-        portas_conectadas=portas_conectadas,
-        conexoes_portas=conexoes_portas
-    )
 
 @app.route("/conexoes", methods=["GET", "POST"])
 def conexoes():

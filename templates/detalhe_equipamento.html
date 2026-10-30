@@ -17,8 +17,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
-        <a href="{{ url_for('regiao') }}">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
     </nav>
 </header>
 
@@ -208,13 +208,12 @@
 <div class="acoes acoes-detalhes">
 
     <a class="botao botao-principal"
-       href="{{ url_for('portas_equipamento', equipamento_id=equipamento.id) }}">
-        <span>Portas e conexões</span>
+{{ url_for('equipamentos.portas_equipamento', equipamento_id=equipamento.id) }}        <span>Portas e conexões</span>
         <span aria-hidden="true">→</span>
     </a>
 
     <a class="botao botao-secundario"
-       href="{{ url_for('equipamentos') }}">
+       href="{{ url_for('equipamentos.equipamentos') }}">
         ← Voltar aos equipamentos
     </a>
 

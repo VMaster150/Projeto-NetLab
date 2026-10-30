@@ -1,5 +1,17 @@
-chat
-@app.route("/regiao", methods=["GET", "POST"])
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from config import db
+from models.equipamento import Equipamento
+from models.regiao import Regiao
+
+bp_regioes = Blueprint("regioes", __name__)
+
+
+
+
+
+
+
+@bp_regioes.route("/regiao", methods=["GET", "POST"])
 def regiao():
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
@@ -8,7 +20,7 @@ def regiao():
 
         if not nome:
             flash("O nome da região é obrigatório.", "erro")
-            return redirect(url_for("regiao"))
+            return redirect(url_for("regioes.regiao"))
 
         regiao_pai = None
 
@@ -20,7 +32,7 @@ def regiao():
 
             if regiao_pai is None:
                 flash("A região pai selecionada não existe.", "erro")
-                return redirect(url_for("regiao"))
+                return redirect(url_for("regioes.regiao"))
 
         nova_regiao = Regiao(
             nome=nome,
@@ -34,10 +46,10 @@ def regiao():
             flash("Região cadastrada com sucesso!", "sucesso")
         except Exception:
             db.session.rollback()
-            app.logger.exception("Erro ao cadastrar região")
+            current_app.logger.exception("Erro ao cadastrar região")
             flash("Não foi possível cadastrar a região.", "erro")
 
-        return redirect(url_for("regiao"))
+        return redirect(url_for("regioes.regiao"))
 
     # Identificador da região escolhida no seletor
     filtro_regiao_id = request.args.get("filtro_regiao_id", type=int)
@@ -81,7 +93,7 @@ def regiao():
 
         if regiao_selecionada is None:
             flash("A região selecionada não existe.", "erro")
-            return redirect(url_for("regiao"))
+            return redirect(url_for("regioes.regiao"))
 
         # Começa com a região escolhida e inclui todas as suas sub-regiões
         ids_regioes_visiveis = set()
@@ -113,7 +125,7 @@ def regiao():
 
 
 
-@app.route("/regiao/<int:id>/editar", methods=["GET", "POST"])
+@bp_regioes.route("/regiao/<int:id>/editar", methods=["GET", "POST"])
 def editar_regiao(id):
     regiao_atual = db.get_or_404(Regiao, id)
     if request.method == "POST":
@@ -122,7 +134,7 @@ def editar_regiao(id):
         regiao_pai_id = request.form.get("regiao_pai_id", "").strip()
         if not nome:
             flash("O nome da região é obrigatório.", "erro")
-            return redirect(url_for("editar_regiao", id=id))
+            return redirect(url_for("regioes.editar_regiao", id=id))
         regiao_pai = None
         if regiao_pai_id:
             try:
@@ -134,7 +146,7 @@ def editar_regiao(id):
 
             if regiao_pai is None:
                 flash("A região pai selecionada não existe.", "erro")
-                return redirect(url_for("editar_regiao", id=id))
+                return redirect(url_for("regioes.editar_regiao", id=id))
 
             # Impede que a região seja pai dela mesma
             # ou de uma de suas regiões ancestrais.
@@ -148,7 +160,7 @@ def editar_regiao(id):
                         "erro"
                     )
                     return redirect(
-                        url_for("editar_regiao", id=id)
+                        url_for("regioes.editar_regiao", id=id)
                     )
 
                 verificar = verificar.regiao_pai
@@ -160,11 +172,11 @@ def editar_regiao(id):
         try:
             db.session.commit()
             flash("Região atualizada com sucesso!", "sucesso")
-            return redirect(url_for("regiao"))
+            return redirect(url_for("regioes.regiao"))
         except Exception:
             db.session.rollback()
             flash("Não foi possível atualizar a região.", "erro")
-            return redirect(url_for("editar_regiao", id=id))
+            return redirect(url_for("regioes.editar_regiao", id=id))
     todas_regioes = Regiao.query.order_by(Regiao.nome).all()
     regioes_para_selecao = []
     def organizar_regioes(lista_regioes, nivel=0):
@@ -192,26 +204,44 @@ def editar_regiao(id):
 
 
 
-@app.route("/regiao/<int:id>/excluir", methods=["POST"])
-def excluir_regiao(id):
-    regiao = db.get_or_404(Regiao, id)
 
+
+@bp_regioes.route("/regiao/<int:id>/excluir", methods=["POST"])
+def excluir_regiao(id):
+    regiao = db.session.get(Regiao, id)
+
+    if regiao is None:
+        flash("Região não encontrada.", "erro")
+        return redirect(url_for("regioes.regiao"))
+
+    # Verifica se existem sub-regiões
     if regiao.subregioes:
+        flash("Não é possível excluir: esta região possui sub-regiões.", "erro")
+        return redirect(url_for("regioes.regiao"))
+
+    # Verifica se existem equipamentos vinculados
+    equipamentos_vinculados = Equipamento.query.filter_by(
+        regiao_id=id
+    ).first()
+
+    if equipamentos_vinculados:
         flash(
-            "Não é possível excluir esta região, "
-            "pois ela possui sub-regiões. "
-            "Mova ou exclua as sub-regiões primeiro.",
+            "Não é possível excluir: existem equipamentos nesta região.",
             "erro"
         )
-        return redirect(url_for("regiao"))
+        return redirect(url_for("regioes.regiao"))
 
     try:
         db.session.delete(regiao)
         db.session.commit()
+
         flash("Região excluída com sucesso!", "sucesso")
+
     except Exception:
         db.session.rollback()
+        current_app.logger.exception("Erro ao excluir região")
         flash("Não foi possível excluir a região.", "erro")
 
-    return redirect(url_for("regiao"))
+    return redirect(url_for("regioes.regiao"))
+
 

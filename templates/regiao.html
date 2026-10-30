@@ -17,8 +17,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
-        <a href="{{ url_for('regiao') }}" class="ativo">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}" class="ativo">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
     </nav>
 </header>
 
@@ -45,7 +45,7 @@
                 <h2>Nova região</h2>
             </div>
 
-            <form method="POST" action="{{ url_for('regiao') }}" class="formulario">
+            <form method="POST" action="{{ url_for('regioes.regiao') }}" class="formulario">
 
                 <div class="campo">
                     <label for="nome">Nome da região *</label>
@@ -114,7 +114,7 @@ aria-expanded="{{ 'true' if filtro_regiao_id else 'false' }}"                   
 <form
     id="form-filtro-regioes"
     method="GET"
-    action="{{ url_for('regiao') }}"
+    action="{{ url_for('regioes.regiao') }}"
     style="display: {{ 'block' if filtro_regiao_id else 'none' }}; margin-bottom: 20px;">
 
     <div class="campo">
@@ -138,7 +138,7 @@ aria-expanded="{{ 'true' if filtro_regiao_id else 'false' }}"                   
 
         <a
             class="botao botao-secundario"
-            href="{{ url_for('regiao') }}">
+            href="{{ url_for('regioes.regiao') }}">
             Limpar filtro
         </a>
     </div>
@@ -179,13 +179,13 @@ aria-expanded="{{ 'true' if filtro_regiao_id else 'false' }}"                   
 
                                         <a
                                             class="botao botao-secundario"
-                                            href="{{ url_for('editar_regiao', id=item.id) }}">
+                                            href="{{ url_for('regioes.editar_regiao', id=item.id) }}">
                                             Editar
                                         </a>
 
                                         <form
                                             method="POST"
-                                            action="{{ url_for('excluir_regiao', id=item.id) }}"
+                                            action="{{ url_for('regioes.excluir_regiao', id=item.id) }}"
                                             onsubmit="return confirm('Deseja realmente excluir esta região?');">
 
                                             <button type="submit" class="botao-perigo">
@@ -218,7 +218,7 @@ aria-expanded="{{ 'true' if filtro_regiao_id else 'false' }}"                   
 
                     {% if pesquisa %}
                         <p>Nenhuma região encontrada para "{{ pesquisa }}".</p>
-                        <a class="botao botao-secundario" href="{{ url_for('regiao') }}">
+                        <a class="botao botao-secundario" href="{{ url_for('regioes.regiao') }}">
                             Limpar filtro
                         </a>
                     {% else %}

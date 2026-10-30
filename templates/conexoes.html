@@ -20,7 +20,7 @@
         <section class="card">
             <h2>Conectar duas portas</h2>
 
-            <form method="POST" action="{{ url_for('conexoes') }}">
+            <form method="POST" action="{{ url_for('conexoes.conexoes') }}">
                 <label for="interface_origem_id">Porta de origem</label>
                 <select
                     id="interface_origem_id"
@@ -110,7 +110,7 @@
         </section>
 
         <p>
-            <a href="{{ url_for('equipamentos') }}">
+            <a href="{{ url_for('equipamentos.equipamentos') }}">
                 Voltar para equipamentos
             </a>
         </p>

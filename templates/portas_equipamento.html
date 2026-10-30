@@ -17,8 +17,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
-        <a href="{{ url_for('regiao') }}">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}" class="ativo">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentps.equipamentos') }}" class="ativo">Equipamentos</a>
     </nav>
 </header>
 
@@ -31,8 +31,8 @@
 
     <p class="caminho-pagina">
         <a href="{{ url_for('index') }}">Início</a> /
-        <a href="{{ url_for('equipamentos') }}">Equipamentos</a> /
-        <a href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a> /
+        <a href="{{ url_for('equipamentos.detalhe_equipamento', id=equipamento.id) }}">
             {{ equipamento.nome }}
         </a>
         / Portas
@@ -71,12 +71,12 @@
 
         <div class="acoes">
             <a class="botao botao-secundario"
-               href="{{ url_for('detalhe_equipamento', id=equipamento.id) }}">
+               href="{{ url_for('equipamentos.detalhe_equipamento', id=equipamento.id) }}">
                 Voltar aos detalhes
             </a>
 
             <a class="botao botao-secundario"
-               href="{{ url_for('equipamentos') }}">
+               href="{{ url_for('equipamentos.equipamentos') }}">
                 Todos os equipamentos
             </a>
         </div>
@@ -175,7 +175,7 @@
 
     <div class="acoes">
         <a class="botao botao-secundario"
-           href="{{ url_for('equipamentos') }}">
+           href="{{ url_for('equipamentos.equipamentos') }}">
             ← Voltar para equipamentos
         </a>
 

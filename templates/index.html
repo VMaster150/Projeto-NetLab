@@ -18,8 +18,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}" class="ativo">Início</a>
-        <a href="{{ url_for('regiao') }}">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
     </nav>
 </header>
 
@@ -39,7 +39,7 @@
 
             <p>Organize sua infraestrutura em locais e sub-regiões hierárquicas, como prédios, salas e setores.</p>
 
-            <a class="botao" href="{{ url_for('regiao') }}">
+            <a class="botao" href="{{ url_for('regioes.regiao') }}">
                 Gerenciar regiões →
             </a>
         </article>
@@ -52,7 +52,7 @@
 
             <p>Cadastre dispositivos, associe fabricantes e modelos e vincule cada equipamento à sua região.</p>
 
-            <a class="botao" href="{{ url_for('equipamentos') }}">
+            <a class="botao" href="{{ url_for('equipamentos.equipamentos') }}">
                 Gerenciar equipamentos →
             </a>
         </article>

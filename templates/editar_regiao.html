@@ -17,8 +17,8 @@
 
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
-        <a href="{{ url_for('regiao') }}" class="ativo">Regiões</a>
-        <a href="{{ url_for('equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('regioes.regiao') }}" class="ativo">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
     </nav>
 </header>
 
@@ -44,7 +44,7 @@
         </div>
 
         <form method="POST"
-              action="{{ url_for('editar_regiao', id=regiao.id) }}"
+              action="{{ url_for('regioes.editar_regiao', id=regiao.id) }}"
               class="formulario">
 
             <div class="campo">
@@ -92,7 +92,7 @@
             <div class="acoes" style="margin-top: 24px;">
                 <button type="submit">Salvar alterações</button>
                 <a class="botao botao-secundario"
-                   href="{{ url_for('regiao') }}">
+                   href="{{ url_for('regioes.regiao') }}">
                     Cancelar
                 </a>
             </div>
