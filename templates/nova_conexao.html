@@ -28,7 +28,7 @@
             <h2>Destino</h2>
 
             <form method="GET"
-                  action="{{ url_for('nova_conexao',
+                  action="{{ url_for('conexoes.nova_conexao',
                                      interface_id=porta_origem.id) }}">
                 <label for="equipamento_destino_id">
                     Equipamento de destino
@@ -57,7 +57,7 @@
 
                 {% if portas_destino %}
                     <form method="POST"
-                          action="{{ url_for('nova_conexao',
+                          action="{{ url_for('conexoes.nova_conexao',
                                              interface_id=porta_origem.id) }}">
 
                         <input type="hidden"

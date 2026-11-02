@@ -7,7 +7,6 @@ class ModeloEquipamento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fabricante_id = db.Column(db.Integer, db.ForeignKey('fabricantes.id'), nullable=False)
     modelo = db.Column(db.String(150), nullable=False, unique=True)
-    slug = db.Column(db.String(200), nullable=False, unique=True)
     altura_u = db.Column(db.Float, nullable=False, default=0.0)
     profundidade_completa = db.Column(db.Boolean,nullable=False,default=False)
     fluxo_ar = db.Column(db.String(50),nullable=True)

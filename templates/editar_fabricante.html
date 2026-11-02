@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar fabricante | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}" class="ativo">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Editar fabricante</h1>
+        <p>Atualize o nome do fabricante selecionado.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ fabricante.nome }}</h2>
+            <span class="etiqueta">ID: {{ fabricante.id }}</span>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('fabricantes.editar_fabricante', id=fabricante.id) }}"
+              class="formulario">
+
+            <div class="campo">
+                <label for="nome">Nome do fabricante *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    maxlength="100"
+                    value="{{ fabricante.nome }}"
+                    required
+                >
+            </div>
+
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+
+                <a class="botao botao-secundario"
+                   href="{{ url_for('fabricantes.fabricantes') }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Cadastro de fabricantes
+</footer>
+
+</body>
+</html>

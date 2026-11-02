@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar modelo | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Editar modelo</h1>
+        <p>Atualize as características técnicas do modelo selecionado.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ modelo.modelo }}</h2>
+            <span class="etiqueta">ID: {{ modelo.id }}</span>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('modelos.editar_modelo', id=modelo.id) }}"
+              class="formulario">
+
+            <div class="campo">
+                <label for="fabricante_id">Fabricante *</label>
+                <select id="fabricante_id" name="fabricante_id" required>
+                    <option value="">Selecione um fabricante</option>
+
+                    {% for fabricante in fabricantes %}
+                        <option
+                            value="{{ fabricante.id }}"
+                            {% if modelo.fabricante_id == fabricante.id %}selected{% endif %}
+                        >
+                            {{ fabricante.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="modelo">Nome do modelo *</label>
+                <input
+                    type="text"
+                    id="modelo"
+                    name="modelo"
+                    maxlength="150"
+                    value="{{ modelo.modelo }}"
+                    required
+                >
+            </div>
+
+
+
+            <div class="campo">
+                <label for="altura_u">Altura em U</label>
+                <input
+                    type="number"
+                    id="altura_u"
+                    name="altura_u"
+                    min="0"
+                    step="0.1"
+                    value="{{ modelo.altura_u }}"
+                >
+            </div>
+
+            <div class="campo">
+                <label for="fluxo_ar">Fluxo de ar</label>
+                <input
+                    type="text"
+                    id="fluxo_ar"
+                    name="fluxo_ar"
+                    maxlength="50"
+                    value="{{ modelo.fluxo_ar or '' }}"
+                    placeholder="Ex.: Front-to-Back"
+                >
+            </div>
+
+            <div class="campo">
+                <label for="peso">Peso</label>
+                <div style="display: flex; gap: 10px;">
+                    <input
+                        type="number"
+                        id="peso"
+                        name="peso"
+                        min="0"
+                        step="0.01"
+                        value="{{ modelo.peso if modelo.peso is not none else '' }}"
+                        placeholder="Ex.: 4.5"
+                        style="flex: 1;"
+                    >
+
+                    <select
+                        id="unidade_peso"
+                        name="unidade_peso"
+                        style="max-width: 100px;"
+                    >
+                        <option value="">Unidade</option>
+                        <option value="kg" {% if modelo.unidade_peso == 'kg' %}selected{% endif %}>kg</option>
+                        <option value="g" {% if modelo.unidade_peso == 'g' %}selected{% endif %}>g</option>
+                        <option value="lb" {% if modelo.unidade_peso == 'lb' %}selected{% endif %}>lb</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>
+                    <input
+                        type="checkbox"
+                        id="profundidade_completa"
+                        name="profundidade_completa"
+                        style="width: auto; margin-right: 8px;"
+                        {% if modelo.profundidade_completa %}checked{% endif %}
+                    >
+                    Ocupa a profundidade completa do rack
+                </label>
+            </div>
+
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+
+                <a class="botao botao-secundario"
+                   href="{{ url_for('modelos.modelos') }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+        <div class="acoes" style="margin-top: 24px;">
+            <a
+                class="botao botao-secundario"
+                href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}"
+            >
+                Gerenciar interfaces
+            </a>
+
+            <a
+                class="botao botao-secundario"
+                href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}"
+            >
+                Gerenciar portas de alimentação
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Edição de modelos
+</footer>
+
+</body>
+</html>

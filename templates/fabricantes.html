@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabricantes | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}" class="ativo">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Fabricantes</h1>
+        <p>Cadastre os fabricantes usados no catálogo de equipamentos.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="grade">
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Novo fabricante</h2>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('fabricantes.fabricantes') }}"
+                  class="formulario">
+
+                <div class="campo">
+                    <label for="nome">Nome do fabricante *</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        placeholder="Ex.: Cisco"
+                        required
+                    >
+                </div>
+
+                <button type="submit">Cadastrar fabricante</button>
+            </form>
+        </article>
+
+        <!-- LISTAGEM -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Fabricantes cadastrados</h2>
+                <span class="etiqueta">
+                    {{ fabricantes|length }}
+                    {% if fabricantes|length == 1 %}
+                        registrado
+                    {% else %}
+                        registrados
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if fabricantes %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Modelos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for fabricante in fabricantes %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ fabricante.nome }}</strong>
+                                    </td>
+
+                                    <td>{{ fabricante.modelos|length }}</td>
+
+                                    <td>
+                                        <div class="acoes">
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('fabricantes.editar_fabricante', id=fabricante.id) }}"
+                                            >
+                                                Editar
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('fabricantes.excluir_fabricante', id=fabricante.id) }}"
+                                                onsubmit="return confirm('Deseja realmente excluir este fabricante?');"
+                                            >
+                                                <button type="submit" class="botao-perigo">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhum fabricante cadastrado.</p>
+                    <p>Use o formulário para adicionar o primeiro.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    <div style="margin-top: 24px;">
+        <a class="botao botao-secundario" href="{{ url_for('index') }}">
+            ← Voltar ao início
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Catálogo de fabricantes
+</footer>
+
+</body>
+</html>

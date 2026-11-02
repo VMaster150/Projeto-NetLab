@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portas de alimentação do modelo | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a> /
+        {{ modelo.fabricante.nome }} {{ modelo.modelo }} /
+        Portas de alimentação
+    </p>
+
+    <section class="titulo-pagina">
+        <h1>Portas de alimentação</h1>
+        <p>
+            {{ modelo.fabricante.nome }} {{ modelo.modelo }} —
+            cadastre as entradas de energia previstas para este modelo.
+        </p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="grade">
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Nova porta de alimentação</h2>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}"
+                  class="formulario">
+
+                <div class="campo">
+                    <label for="nome">Nome da porta *</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        placeholder="Ex.: PSU 1"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="tipo">Tipo *</label>
+                    <input
+                        type="text"
+                        id="tipo"
+                        name="tipo"
+                        maxlength="100"
+                        placeholder="Ex.: IEC 60320 C14"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="descricao">Descrição</label>
+                    <textarea
+                        id="descricao"
+                        name="descricao"
+                        maxlength="500"
+                        placeholder="Observações sobre esta entrada (opcional)"
+                    ></textarea>
+                </div>
+
+                <button type="submit">Cadastrar porta</button>
+            </form>
+        </article>
+
+        <!-- LISTAGEM -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Portas cadastradas</h2>
+                <span class="etiqueta">
+                    {{ portas|length }}
+                    {% if portas|length == 1 %}
+                        porta
+                    {% else %}
+                        portas
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if portas %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for porta in portas %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ porta.nome }}</strong>
+                                    </td>
+
+                                    <td>{{ porta.tipo }}</td>
+
+                                    <td>{{ porta.descricao or '—' }}</td>
+
+                                    <td>
+                                        <div class="acoes">
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('modelos.editar_porta_alimentacao_modelo', modelo_id=modelo.id, porta_id=porta.id) }}"
+                                            >
+                                                Editar
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('modelos.excluir_porta_alimentacao_modelo', modelo_id=modelo.id, porta_id=porta.id) }}"
+                                                onsubmit="return confirm('Deseja realmente excluir esta porta?');"
+                                            >
+                                                <button type="submit" class="botao-perigo">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhuma porta de alimentação cadastrada.</p>
+                    <p>Use o formulário para adicionar a primeira.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    <div style="margin-top: 24px;">
+        <a class="botao botao-secundario"
+           href="{{ url_for('modelos.modelos') }}">
+            ← Voltar aos modelos
+        </a>
+
+        <a class="botao botao-secundario"
+           href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}">
+            Interfaces
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Portas de alimentação do modelo
+</footer>
+
+</body>
+</html>

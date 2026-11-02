@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="pagina-login">
+
+<main class="login-wrapper">
+
+    <section class="login-painel">
+
+        <div class="login-topo">
+            <span class="marca-simbolo">N</span>
+
+            <div>
+                <h1>NetLab</h1>
+                <p>Gerenciamento de infraestrutura de redes</p>
+            </div>
+        </div>
+
+        {% if erro %}
+            <div class="mensagem erro">{{ erro }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('login') }}" class="formulario">
+
+            <input
+                type="hidden"
+                name="next"
+                value="{{ request.args.get('next', '') }}"
+            >
+
+            <div class="campo">
+                <label for="usuario">Usuário</label>
+                <input
+                    type="text"
+                    id="usuario"
+                    name="usuario"
+                    placeholder="Digite seu usuário"
+                    autocomplete="username"
+                    autofocus
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="botao-principal">Entrar</button>
+        </form>
+
+        <p class="login-dica">
+            Acesso padrão: <code>admin</code> / <code>netlab</code>
+        </p>
+
+    </section>
+
+    <footer class="login-rodape">
+        NetLab · Sistema de gerenciamento de infraestrutura de redes
+    </footer>
+
+</main>
+
+</body>
+</html>

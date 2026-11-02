@@ -7,10 +7,6 @@ bp_regioes = Blueprint("regioes", __name__)
 
 
 
-
-
-
-
 @bp_regioes.route("/regiao", methods=["GET", "POST"])
 def regiao():
     if request.method == "POST":

@@ -19,7 +19,10 @@
         <a href="{{ url_for('index') }}">Início</a>
         <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
         <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
-    </nav>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
 </header>
 
 <main class="conteudo">
@@ -91,33 +94,32 @@
                         </p>
                     {% endif %}
 
-                    {% if equipamento.modelo.descricao %}
-                        <p>
-                            <strong>Descrição:</strong>
-                            {{ equipamento.modelo.descricao }}
-                        </p>
-                    {% endif %}
-
-                    {% if equipamento.modelo.part_number %}
-                        <p>
-                            <strong>Part number:</strong>
-                            {{ equipamento.modelo.part_number }}
-                        </p>
-                    {% endif %}
-
-                    {% if equipamento.modelo.u_height is not none %}
+                    {% if equipamento.modelo.altura_u is not none %}
                         <p>
                             <strong>Altura em rack:</strong>
-                            {{ equipamento.modelo.u_height }} U
+                            {{ equipamento.modelo.altura_u }} U
                         </p>
                     {% endif %}
 
-                    {% if equipamento.modelo.is_full_depth is not none %}
+                    {% if equipamento.modelo.fluxo_ar %}
                         <p>
-                            <strong>Profundidade completa:</strong>
-                            {{ 'Sim' if equipamento.modelo.is_full_depth else 'Não' }}
+                            <strong>Fluxo de ar:</strong>
+                            {{ equipamento.modelo.fluxo_ar }}
                         </p>
                     {% endif %}
+
+                    {% if equipamento.modelo.peso is not none %}
+                        <p>
+                            <strong>Peso:</strong>
+                            {{ equipamento.modelo.peso }}
+                            {{ equipamento.modelo.unidade_peso or '' }}
+                        </p>
+                    {% endif %}
+
+                    <p>
+                        <strong>Profundidade completa:</strong>
+                        {{ 'Sim' if equipamento.modelo.profundidade_completa else 'Não' }}
+                    </p>
 
                 </div>
             {% else %}
@@ -146,7 +148,8 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Tipo</th>
-                                <th>Descrição</th>
+                                <th>Habilitada</th>
+                                <th>Gerenciamento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -154,7 +157,8 @@
                                 <tr>
                                     <td>{{ interface.nome }}</td>
                                     <td>{{ interface.tipo }}</td>
-                                    <td>{{ interface.descricao or '—' }}</td>
+                                    <td>{{ 'Sim' if interface.habilitada else 'Não' }}</td>
+                                    <td>{{ 'Sim' if interface.gerenciamento else 'Não' }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -208,7 +212,8 @@
 <div class="acoes acoes-detalhes">
 
     <a class="botao botao-principal"
-{{ url_for('equipamentos.portas_equipamento', equipamento_id=equipamento.id) }}        <span>Portas e conexões</span>
+       href="{{ url_for('equipamentos.portas_equipamento', equipamento_id=equipamento.id) }}">
+        <span>Portas e conexões</span>
         <span aria-hidden="true">→</span>
     </a>
 

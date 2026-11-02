@@ -19,7 +19,10 @@
         <a href="{{ url_for('index') }}">Início</a>
         <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
         <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
-    </nav>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
 </header>
 
 <main class="conteudo">
@@ -235,14 +238,23 @@
                                     </td>
 
                                     <td>
-                                        <form
-                                            method="POST"
-                                            action="{{ url_for('equipamentos.excluir_equipamento', id=equipamento.id) }}"
-                                            onsubmit="return confirm('Deseja realmente excluir este equipamento e suas conexões?');">
-                                            <button type="submit" class="botao-perigo">
-                                                Excluir
-                                            </button>
-                                        </form>
+                                        <div class="acoes">
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('equipamentos.editar_equipamento', id=equipamento.id) }}"
+                                            >
+                                                Editar
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('equipamentos.excluir_equipamento', id=equipamento.id) }}"
+                                                onsubmit="return confirm('Deseja realmente excluir este equipamento e suas conexões?');">
+                                                <button type="submit" class="botao-perigo">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

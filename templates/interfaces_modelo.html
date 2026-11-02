@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaces do modelo | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a> /
+        {{ modelo.fabricante.nome }} {{ modelo.modelo }} / Interfaces
+    </p>
+
+    <section class="titulo-pagina">
+        <h1>Interfaces do modelo</h1>
+        <p>
+            {{ modelo.fabricante.nome }} {{ modelo.modelo }} —
+            cadastre as interfaces que serão copiadas para cada equipamento
+            deste modelo.
+        </p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="grade">
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Nova interface</h2>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}"
+                  class="formulario">
+
+                <div class="campo">
+                    <label for="nome">Nome da interface *</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        placeholder="Ex.: GigabitEthernet0/1"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="tipo">Tipo *</label>
+                    <input
+                        type="text"
+                        id="tipo"
+                        name="tipo"
+                        maxlength="100"
+                        placeholder="Ex.: 1000BASE-T"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="habilitada"
+                            name="habilitada"
+                            style="width: auto; margin-right: 8px;"
+                            checked
+                        >
+                        Interface habilitada
+                    </label>
+                </div>
+
+                <div class="campo">
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="gerenciamento"
+                            name="gerenciamento"
+                            style="width: auto; margin-right: 8px;"
+                        >
+                        Interface de gerenciamento
+                    </label>
+                </div>
+
+                <button type="submit">Cadastrar interface</button>
+            </form>
+        </article>
+
+        <!-- LISTAGEM -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Interfaces cadastradas</h2>
+                <span class="etiqueta">
+                    {{ interfaces.total }}
+                    {% if interfaces.total == 1 %}
+                        interface
+                    {% else %}
+                        interfaces
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if interfaces.items %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Habilitada</th>
+                                <th>Gerenciamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for interface in interfaces.items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ interface.nome }}</strong>
+                                    </td>
+
+                                    <td>{{ interface.tipo }}</td>
+
+                                    <td>
+                                        {{ 'Sim' if interface.habilitada else 'Não' }}
+                                    </td>
+
+                                    <td>
+                                        {{ 'Sim' if interface.gerenciamento else 'Não' }}
+                                    </td>
+
+                                    <td>
+                                        <div class="acoes">
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('modelos.editar_interface_modelo', modelo_id=modelo.id, interface_id=interface.id) }}"
+                                            >
+                                                Editar
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('modelos.excluir_interface_modelo', modelo_id=modelo.id, interface_id=interface.id) }}"
+                                                onsubmit="return confirm('Deseja realmente excluir esta interface?');"
+                                            >
+                                                <button type="submit" class="botao-perigo">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if interfaces.pages > 1 %}
+                    <div class="acoes" style="margin-top: 18px; justify-content: center;">
+                        {% if interfaces.has_prev %}
+                            <a
+                                class="botao botao-secundario"
+                                href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id, page=interfaces.prev_num) }}"
+                            >
+                                ← Anterior
+                            </a>
+                        {% endif %}
+
+                        <span class="etiqueta">
+                            Página {{ interfaces.page }} de {{ interfaces.pages }}
+                        </span>
+
+                        {% if interfaces.has_next %}
+                            <a
+                                class="botao botao-secundario"
+                                href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id, page=interfaces.next_num) }}"
+                            >
+                                Próxima →
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhuma interface cadastrada para este modelo.</p>
+                    <p>Use o formulário para adicionar a primeira.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    <div style="margin-top: 24px;">
+        <a class="botao botao-secundario"
+           href="{{ url_for('modelos.modelos') }}">
+            ← Voltar aos modelos
+        </a>
+
+        <a class="botao botao-secundario"
+           href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}">
+            Portas de alimentação
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Interfaces do modelo
+</footer>
+
+</body>
+</html>

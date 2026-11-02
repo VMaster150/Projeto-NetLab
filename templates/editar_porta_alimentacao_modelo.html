@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar porta de alimentação | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a> /
+        <a href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}">
+            {{ modelo.modelo }}
+        </a> /
+        Editar porta
+    </p>
+
+    <section class="titulo-pagina">
+        <h1>Editar porta de alimentação</h1>
+        <p>Atualize os dados da entrada de energia do modelo.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ porta.nome }}</h2>
+            <span class="etiqueta">ID: {{ porta.id }}</span>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('modelos.editar_porta_alimentacao_modelo', modelo_id=modelo.id, porta_id=porta.id) }}"
+              class="formulario">
+
+            <div class="campo">
+                <label for="nome">Nome da porta *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    maxlength="100"
+                    value="{{ porta.nome }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="tipo">Tipo *</label>
+                <input
+                    type="text"
+                    id="tipo"
+                    name="tipo"
+                    maxlength="100"
+                    value="{{ porta.tipo }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="descricao">Descrição</label>
+                <textarea
+                    id="descricao"
+                    name="descricao"
+                    maxlength="500"
+                    placeholder="Observações sobre esta entrada (opcional)"
+                >{{ porta.descricao or '' }}</textarea>
+            </div>
+
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+
+                <a class="botao botao-secundario"
+                   href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Edição de portas de alimentação
+</footer>
+
+</body>
+</html>

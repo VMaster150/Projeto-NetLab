@@ -18,8 +18,11 @@
     <nav class="navegacao">
         <a href="{{ url_for('index') }}">Início</a>
         <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
-        <a href="{{ url_for('equipamentps.equipamentos') }}" class="ativo">Equipamentos</a>
-    </nav>
+        <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
 </header>
 
 <main class="conteudo">
@@ -140,7 +143,7 @@
                                         <form
                                             class="formulario-acao-porta"
                                             method="POST"
-                                            action="{{ url_for('desconectar_cabo', conexao_id=conexoes_portas[porta.id].id) }}"
+                                            action="{{ url_for('conexoes.desconectar_cabo', conexao_id=conexoes_portas[porta.id].id) }}"
                                             onsubmit="return confirm('Deseja realmente desconectar este cabo?');"
                                         >
                                             <button type="submit"
@@ -152,7 +155,7 @@
                                     {% elif porta.habilitada %}
 
                                         <a class="botao-acao-porta botao-conectar"
-                                           href="{{ url_for('nova_conexao', interface_id=porta.id) }}">
+                                           href="{{ url_for('conexoes.nova_conexao', interface_id=porta.id) }}">
                                             Conectar cabo
                                         </a>
 

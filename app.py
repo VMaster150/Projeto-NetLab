@@ -1,17 +1,12 @@
 from flask import *
 from config import db
 
-from models.regiao import Regiao
-from models.fabricante import Fabricante
-from models.modelo_equipamento import ModeloEquipamento
-from models.interface_modelo import InterfaceModelo
-from models.porta_alimentacao_modelo import PortaAlimentacaoModelo
-from models.equipamento import Equipamento
-from models.interface_equipamento import InterfaceEquipamento
-from models.conexao import Conexao
+from rotas.conexoes import bp_conexoes
 
 from rotas.regioes import bp_regioes
 from rotas.equipamentos import bp_equipamentos
+from rotas.fabricantes import bp_fabricantes
+from rotas.modelos import bp_modelos
 
 
 app = Flask(__name__)
@@ -26,7 +21,64 @@ db.init_app(app)
 
 app.register_blueprint(bp_regioes)
 app.register_blueprint(bp_equipamentos)
+app.register_blueprint(bp_fabricantes)
+app.register_blueprint(bp_modelos)
+app.register_blueprint(bp_conexoes)
 
+
+# =========================================
+# LOGIN SIMPLES
+# =========================================
+
+USUARIO_PADRAO = "admin"
+SENHA_PADRAO = "netlab"
+
+
+@app.before_request
+def exigir_login():
+    # Libera a própria tela de login e os arquivos estáticos.
+    if request.endpoint in ("login", "static"):
+        return None
+
+    if not session.get("usuario"):
+        return redirect(url_for("login", next=request.path))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if session.get("usuario"):
+        return redirect(url_for("index"))
+
+    erro = None
+
+    if request.method == "POST":
+        usuario = request.form.get("usuario", "").strip()
+        senha = request.form.get("senha", "")
+
+        if usuario == USUARIO_PADRAO and senha == SENHA_PADRAO:
+            session["usuario"] = usuario
+
+            destino = (
+                request.form.get("next")
+                or request.args.get("next")
+                or url_for("index")
+            )
+
+            # Evita redirecionar para fora do próprio site.
+            if not destino.startswith("/") or destino.startswith("//"):
+                destino = url_for("index")
+
+            return redirect(destino)
+
+        erro = "Usuário ou senha inválidos."
+
+    return render_template("login.html", erro=erro)
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 
 @app.route("/")
@@ -43,245 +95,6 @@ def teste_banco():
         db.session.rollback()
         app.logger.exception("Erro ao testar conexão com PostgreSQL")
         return f"Erro ao conectar com o banco: {erro}", 500
-
-
-
-
-
-@app.route("/conexoes", methods=["GET", "POST"])
-def conexoes():
-    if request.method == "POST":
-        origem_id = request.form.get("interface_origem_id", type=int)
-        destino_id = request.form.get("interface_destino_id", type=int)
-        tipo_cabo = request.form.get("tipo_cabo", "Ethernet").strip()
-        descricao = request.form.get("descricao", "").strip()
-
-        if not origem_id or not destino_id:
-            flash("Selecione as duas portas.", "erro")
-            return redirect(url_for("conexoes"))
-
-        if origem_id == destino_id:
-            flash("Escolha duas portas diferentes.", "erro")
-            return redirect(url_for("conexoes"))
-
-        origem = db.session.get(InterfaceEquipamento, origem_id)
-        destino = db.session.get(InterfaceEquipamento, destino_id)
-
-        if origem is None or destino is None:
-            flash("Uma das portas selecionadas não existe.", "erro")
-            return redirect(url_for("conexoes"))
-
-        if not origem.habilitada or not destino.habilitada:
-            flash("As duas portas precisam estar habilitadas.", "erro")
-            return redirect(url_for("conexoes"))
-
-        if origem.equipamento_id == destino.equipamento_id:
-            flash(
-                "Selecione portas de equipamentos diferentes.",
-                "erro"
-            )
-            return redirect(url_for("conexoes"))
-
-        if not tipo_cabo:
-            flash("Informe o tipo de cabo.", "erro")
-            return redirect(url_for("conexoes"))
-
-        # Verifica se alguma das portas já está conectada.
-        conexao_existente = Conexao.query.filter(
-            db.or_(
-                Conexao.interface_origem_id.in_([origem_id, destino_id]),
-                Conexao.interface_destino_id.in_([origem_id, destino_id])
-            )
-        ).first()
-
-        if conexao_existente:
-            flash("Uma das portas já está conectada.", "erro")
-            return redirect(url_for("conexoes"))
-
-        nova_conexao = Conexao(
-            interface_origem_id=origem_id,
-            interface_destino_id=destino_id,
-            tipo_cabo=tipo_cabo,
-            descricao=descricao or None
-        )
-
-        try:
-            db.session.add(nova_conexao)
-            db.session.commit()
-            flash("Conexão criada com sucesso!", "sucesso")
-        except Exception:
-            db.session.rollback()
-            app.logger.exception("Erro ao criar conexão")
-            flash("Não foi possível criar a conexão.", "erro")
-
-        return redirect(url_for("conexoes"))
-
-    portas = (
-        InterfaceEquipamento.query
-        .join(Equipamento)
-        .filter(InterfaceEquipamento.habilitada.is_(True))
-        .order_by(Equipamento.nome, InterfaceEquipamento.nome)
-        .all()
-    )
-
-    conexoes_cadastradas = (
-        Conexao.query
-        .order_by(Conexao.id.desc())
-        .all()
-    )
-
-    return render_template(
-        "conexoes.html",
-        portas=portas,
-        conexoes=conexoes_cadastradas
-    )
-
-
-
-@app.route("/nova-conexao/<int:interface_id>", methods=["GET", "POST"])
-def nova_conexao(interface_id):
-    porta_origem = db.session.get(InterfaceEquipamento, interface_id)
-
-    if porta_origem is None:
-        flash("Porta de origem não encontrada.", "erro")
-        return redirect(url_for("equipamentos"))
-
-    if not porta_origem.habilitada:
-        flash("Esta porta está desabilitada.", "erro")
-        return redirect(url_for(
-            "portas_equipamento",
-            equipamento_id=porta_origem.equipamento_id
-        ))
-
-    # Verifica se a porta de origem já está conectada.
-    conexao_existente = Conexao.query.filter(
-        db.or_(
-            Conexao.interface_origem_id == porta_origem.id,
-            Conexao.interface_destino_id == porta_origem.id
-        )
-    ).first()
-
-    if conexao_existente:
-        flash("Esta porta já está conectada.", "erro")
-        return redirect(url_for(
-            "portas_equipamento",
-            equipamento_id=porta_origem.equipamento_id
-        ))
-
-    equipamentos_destino = (
-        Equipamento.query
-        .filter(Equipamento.id != porta_origem.equipamento_id)
-        .order_by(Equipamento.nome)
-        .all()
-    )
-
-    equipamento_destino_id = request.values.get(
-        "equipamento_destino_id", type=int
-    )
-
-    portas_destino = []
-
-    if equipamento_destino_id:
-        equipamento_destino = db.session.get(
-            Equipamento, equipamento_destino_id
-        )
-
-        if (
-            equipamento_destino is not None
-            and equipamento_destino.id != porta_origem.equipamento_id
-        ):
-            portas_destino = (
-                InterfaceEquipamento.query
-                .filter_by(
-                    equipamento_id=equipamento_destino.id,
-                    habilitada=True
-                )
-                .order_by(InterfaceEquipamento.nome)
-                .all()
-            )
-
-            # Retira da lista as portas que já estão conectadas.
-            portas_destino = [
-                porta for porta in portas_destino
-                if not Conexao.query.filter(
-                    db.or_(
-                        Conexao.interface_origem_id == porta.id,
-                        Conexao.interface_destino_id == porta.id
-                    )
-                ).first()
-            ]
-
-    if request.method == "POST":
-        destino_id = request.form.get("interface_destino_id", type=int)
-        tipo_cabo = request.form.get("tipo_cabo", "Ethernet").strip()
-        descricao = request.form.get("descricao", "").strip()
-
-        porta_destino = db.session.get(InterfaceEquipamento, destino_id)
-
-        if (
-            porta_destino is None
-            or porta_destino not in portas_destino
-        ):
-            flash("Selecione uma porta de destino válida e disponível.", "erro")
-        elif not tipo_cabo:
-            flash("Informe o tipo de cabo.", "erro")
-        else:
-            nova_conexao = Conexao(
-                interface_origem_id=porta_origem.id,
-                interface_destino_id=porta_destino.id,
-                tipo_cabo=tipo_cabo,
-                descricao=descricao or None
-            )
-
-            try:
-                db.session.add(nova_conexao)
-                db.session.commit()
-
-                flash("Cabo conectado com sucesso!", "sucesso")
-                return redirect(url_for(
-                    "portas_equipamento",
-                    equipamento_id=porta_origem.equipamento_id
-                ))
-            except Exception:
-                db.session.rollback()
-                app.logger.exception("Erro ao criar conexão")
-                flash("Não foi possível criar a conexão.", "erro")
-
-    return render_template(
-        "nova_conexao.html",
-        porta_origem=porta_origem,
-        equipamentos_destino=equipamentos_destino,
-        equipamento_destino_id=equipamento_destino_id,
-        portas_destino=portas_destino
-    )
-
-
-@app.route("/desconectar/<int:conexao_id>", methods=["POST"])
-def desconectar_cabo(conexao_id):
-    conexao = db.session.get(Conexao, conexao_id)
-
-    if conexao is None:
-        flash("Conexão não encontrada.", "erro")
-        return redirect(url_for("equipamentos"))
-
-    equipamento_id = conexao.interface_origem.equipamento_id
-
-    try:
-        db.session.delete(conexao)
-        db.session.commit()
-        flash("Cabo desconectado com sucesso!", "sucesso")
-    except Exception:
-        db.session.rollback()
-        app.logger.exception("Erro ao desconectar cabo")
-        flash("Não foi possível desconectar o cabo.", "erro")
-
-    return redirect(url_for(
-        "portas_equipamento",
-        equipamento_id=equipamento_id
-    ))
-
-
-
 
 with app.app_context():
     db.create_all()

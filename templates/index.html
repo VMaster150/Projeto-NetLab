@@ -20,7 +20,10 @@
         <a href="{{ url_for('index') }}" class="ativo">Início</a>
         <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
         <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
-    </nav>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
 </header>
 
 <main class="conteudo">
@@ -54,6 +57,32 @@
 
             <a class="botao" href="{{ url_for('equipamentos.equipamentos') }}">
                 Gerenciar equipamentos →
+            </a>
+        </article>
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Fabricantes</h2>
+                <span class="etiqueta">03</span>
+            </div>
+
+            <p>Mantenha o catálogo de fabricantes que fornecem os modelos dos dispositivos.</p>
+
+            <a class="botao" href="{{ url_for('fabricantes.fabricantes') }}">
+                Gerenciar fabricantes →
+            </a>
+        </article>
+
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Modelos</h2>
+                <span class="etiqueta">04</span>
+            </div>
+
+            <p>Cadastre modelos, suas interfaces de rede e portas de alimentação.</p>
+
+            <a class="botao" href="{{ url_for('modelos.modelos') }}">
+                Gerenciar modelos →
             </a>
         </article>
     </section>

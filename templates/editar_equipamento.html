@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar equipamento | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}" class="ativo">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a> /
+        <a href="{{ url_for('equipamentos.detalhe_equipamento', id=equipamento.id) }}">
+            {{ equipamento.nome }}
+        </a> /
+        Editar
+    </p>
+
+    <section class="titulo-pagina">
+        <h1>Editar equipamento</h1>
+        <p>Atualize as informações básicas do dispositivo selecionado.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ equipamento.nome }}</h2>
+            <span class="etiqueta">ID: {{ equipamento.id }}</span>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('equipamentos.editar_equipamento', id=equipamento.id) }}"
+              class="formulario">
+
+            <div class="campo">
+                <label for="nome">Nome do equipamento *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    maxlength="150"
+                    value="{{ equipamento.nome }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="tipo">Tipo de equipamento *</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecione um tipo</option>
+
+                    {% set tipos = [
+                        'Roteador',
+                        'Switch',
+                        'Computador',
+                        'Notebook',
+                        'Celular',
+                        'Servidor',
+                        'Access Point',
+                        'Outro'
+                    ] %}
+
+                    {% for tipo in tipos %}
+                        <option
+                            value="{{ tipo }}"
+                            {% if equipamento.tipo == tipo %}selected{% endif %}
+                        >
+                            {{ tipo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="regiao_id">Região *</label>
+                <select id="regiao_id" name="regiao_id" required>
+                    <option value="">Selecione uma região</option>
+
+                    {% for regiao in regioes %}
+                        <option
+                            value="{{ regiao.id }}"
+                            {% if equipamento.regiao_id == regiao.id %}selected{% endif %}
+                        >
+                            {{ regiao.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+
+                <a class="botao botao-secundario"
+                   href="{{ url_for('equipamentos.detalhe_equipamento', id=equipamento.id) }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Edição de equipamentos
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar interface | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <p class="caminho-pagina">
+        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('modelos.modelos') }}">Modelos</a> /
+        <a href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}">
+            {{ modelo.modelo }}
+        </a> /
+        Editar interface
+    </p>
+
+    <section class="titulo-pagina">
+        <h1>Editar interface</h1>
+        <p>Atualize os dados da interface do modelo.</p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="cartao" style="max-width: 760px; margin: 0 auto;">
+        <div class="cabecalho-cartao">
+            <h2>{{ interface.nome }}</h2>
+            <span class="etiqueta">ID: {{ interface.id }}</span>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('modelos.editar_interface_modelo', modelo_id=modelo.id, interface_id=interface.id) }}"
+              class="formulario">
+
+            <div class="campo">
+                <label for="nome">Nome da interface *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    maxlength="100"
+                    value="{{ interface.nome }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="tipo">Tipo *</label>
+                <input
+                    type="text"
+                    id="tipo"
+                    name="tipo"
+                    maxlength="100"
+                    value="{{ interface.tipo }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label>
+                    <input
+                        type="checkbox"
+                        id="habilitada"
+                        name="habilitada"
+                        style="width: auto; margin-right: 8px;"
+                        {% if interface.habilitada %}checked{% endif %}
+                    >
+                    Interface habilitada
+                </label>
+            </div>
+
+            <div class="campo">
+                <label>
+                    <input
+                        type="checkbox"
+                        id="gerenciamento"
+                        name="gerenciamento"
+                        style="width: auto; margin-right: 8px;"
+                        {% if interface.gerenciamento %}checked{% endif %}
+                    >
+                    Interface de gerenciamento
+                </label>
+            </div>
+
+            <div class="acoes" style="margin-top: 24px;">
+                <button type="submit">Salvar alterações</button>
+
+                <a class="botao botao-secundario"
+                   href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Edição de interfaces
+</footer>
+
+</body>
+</html>

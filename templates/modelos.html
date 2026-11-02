@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelos | NetLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <a class="marca" href="{{ url_for('index') }}">
+        <span class="marca-simbolo">N</span>
+        <span>NetLab</span>
+    </a>
+
+    <nav class="navegacao">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
+        <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
+        <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
+        <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
+        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+</nav>
+</header>
+
+<main class="conteudo">
+
+    <section class="titulo-pagina">
+        <h1>Modelos de equipamento</h1>
+        <p>
+            Cadastre os modelos do catálogo e defina suas interfaces e
+            portas de alimentação.
+        </p>
+    </section>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="mensagem {{ categoria }}">{{ mensagem }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="grade">
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Novo modelo</h2>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('modelos.modelos') }}"
+                  class="formulario">
+
+                <div class="campo">
+                    <label for="fabricante_id">Fabricante *</label>
+                    <select id="fabricante_id" name="fabricante_id" required>
+                        <option value="">Selecione um fabricante</option>
+
+                        {% for fabricante in fabricantes %}
+                            <option value="{{ fabricante.id }}">
+                                {{ fabricante.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    {% if not fabricantes %}
+                        <small style="color: var(--texto-suave);">
+                            Cadastre um fabricante antes de criar um modelo.
+                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="modelo">Nome do modelo *</label>
+                    <input
+                        type="text"
+                        id="modelo"
+                        name="modelo"
+                        maxlength="150"
+                        placeholder="Ex.: Catalyst 2960-X"
+                        required
+                    >
+                </div>
+
+
+
+                <div class="campo">
+                    <label for="altura_u">Altura em U</label>
+                    <input
+                        type="number"
+                        id="altura_u"
+                        name="altura_u"
+                        min="0"
+                        step="0.1"
+                        value="0"
+                        placeholder="Ex.: 1"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="fluxo_ar">Fluxo de ar</label>
+                    <input
+                        type="text"
+                        id="fluxo_ar"
+                        name="fluxo_ar"
+                        maxlength="50"
+                        placeholder="Ex.: Front-to-Back"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="peso">Peso</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input
+                            type="number"
+                            id="peso"
+                            name="peso"
+                            min="0"
+                            step="0.01"
+                            placeholder="Ex.: 4.5"
+                            style="flex: 1;"
+                        >
+
+                        <select
+                            id="unidade_peso"
+                            name="unidade_peso"
+                            style="max-width: 100px;"
+                        >
+                            <option value="">Unidade</option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="lb">lb</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="profundidade_completa"
+                            name="profundidade_completa"
+                            style="width: auto; margin-right: 8px;"
+                        >
+                        Ocupa a profundidade completa do rack
+                    </label>
+                </div>
+
+                <button type="submit">Cadastrar modelo</button>
+            </form>
+        </article>
+
+        <!-- LISTAGEM -->
+        <article class="cartao">
+            <div class="cabecalho-cartao">
+                <h2>Modelos cadastrados</h2>
+                <span class="etiqueta">
+                    {{ modelos.total }}
+                    {% if modelos.total == 1 %}
+                        registrado
+                    {% else %}
+                        registrados
+                    {% endif %}
+                </span>
+            </div>
+
+            <form
+                method="GET"
+                action="{{ url_for('modelos.modelos') }}"
+                class="formulario"
+                style="margin-bottom: 24px;"
+            >
+                <div class="campo">
+                    <label for="filtro_fabricante_id">Filtrar por fabricante</label>
+                    <select id="filtro_fabricante_id" name="fabricante_id">
+                        <option value="">Todos os fabricantes</option>
+
+                        {% for fabricante in fabricantes %}
+                            <option
+                                value="{{ fabricante.id }}"
+                                {% if filtro_fabricante_id == fabricante.id %}selected{% endif %}
+                            >
+                                {{ fabricante.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="acoes">
+                    <button type="submit">Aplicar filtro</button>
+
+                    <a
+                        class="botao botao-secundario"
+                        href="{{ url_for('modelos.modelos') }}"
+                    >
+                        Limpar filtro
+                    </a>
+                </div>
+            </form>
+
+            {% if modelos.items %}
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fabricante</th>
+                                <th>Modelo</th>
+                                <th>Altura</th>
+                                <th>Profundidade</th>
+                                <th>Interfaces</th>
+                                <th>Portas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for modelo in modelos.items %}
+                                <tr>
+                                    <td>{{ modelo.fabricante.nome }}</td>
+
+                                    <td>
+                                        <strong>{{ modelo.modelo }}</strong>
+                                        <br>
+
+                                    </td>
+
+                                    <td>
+                                        {% if modelo.altura_u %}
+                                            {{ modelo.altura_u }} U
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {{ 'Sim' if modelo.profundidade_completa else 'Não' }}
+                                    </td>
+
+                                    <td>{{ modelo.interfaces|length }}</td>
+
+                                    <td>{{ modelo.portas_alimentacao|length }}</td>
+
+                                    <td>
+                                        <div class="acoes">
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('modelos.interfaces_modelo', modelo_id=modelo.id) }}"
+                                            >
+                                                Interfaces
+                                            </a>
+
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}"
+                                            >
+                                                Portas
+                                            </a>
+
+                                            <a
+                                                class="botao botao-secundario"
+                                                href="{{ url_for('modelos.editar_modelo', id=modelo.id) }}"
+                                            >
+                                                Editar
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('modelos.excluir_modelo', id=modelo.id) }}"
+                                                onsubmit="return confirm('Deseja realmente excluir este modelo e seus componentes?');"
+                                            >
+                                                <button type="submit" class="botao-perigo">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if modelos.pages > 1 %}
+                    <div class="acoes" style="margin-top: 18px; justify-content: center;">
+                        {% if modelos.has_prev %}
+                            <a
+                                class="botao botao-secundario"
+                                href="{{ url_for('modelos.modelos', page=modelos.prev_num, fabricante_id=filtro_fabricante_id) }}"
+                            >
+                                ← Anterior
+                            </a>
+                        {% endif %}
+
+                        <span class="etiqueta">
+                            Página {{ modelos.page }} de {{ modelos.pages }}
+                        </span>
+
+                        {% if modelos.has_next %}
+                            <a
+                                class="botao botao-secundario"
+                                href="{{ url_for('modelos.modelos', page=modelos.next_num, fabricante_id=filtro_fabricante_id) }}"
+                            >
+                                Próxima →
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="lista-vazia">
+                    <p>Nenhum modelo cadastrado.</p>
+                    <p>Use o formulário para adicionar o primeiro.</p>
+                </div>
+            {% endif %}
+        </article>
+
+    </section>
+
+    <div style="margin-top: 24px;">
+        <a class="botao botao-secundario" href="{{ url_for('fabricantes.fabricantes') }}">
+            ← Gerenciar fabricantes
+        </a>
+
+        <a class="botao botao-secundario" href="{{ url_for('index') }}">
+            Início
+        </a>
+    </div>
+
+</main>
+
+<footer class="rodape">
+    NetLab · Catálogo de modelos de equipamento
+</footer>
+
+</body>
+</html>
