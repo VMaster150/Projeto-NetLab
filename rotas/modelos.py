@@ -33,7 +33,6 @@ def _validar_dados_modelo(modelo_id=None):
 
     erros = []
 
-    # Altura em U
     altura_u = 0.0
 
     if altura_bruta:
@@ -45,7 +44,6 @@ def _validar_dados_modelo(modelo_id=None):
             if altura_u < 0:
                 erros.append("A altura em U não pode ser negativa.")
 
-    # Peso
     peso = None
 
     if peso_bruto:
@@ -57,17 +55,14 @@ def _validar_dados_modelo(modelo_id=None):
             if peso < 0:
                 erros.append("O peso não pode ser negativo.")
 
-    # Fabricante
     if not fabricante_id:
         erros.append("Selecione um fabricante.")
     elif db.session.get(Fabricante, fabricante_id) is None:
         erros.append("O fabricante selecionado não existe.")
 
-    # Nome do modelo
     if not nome_modelo:
         erros.append("Informe o nome do modelo.")
 
-    # Unicidade: o nome do modelo é único no banco.
     if nome_modelo:
         consulta_modelo = ModeloEquipamento.query.filter_by(
             modelo=nome_modelo
@@ -97,7 +92,6 @@ def _validar_dados_modelo(modelo_id=None):
 
 
 
-# CREATE + READ
 @bp_modelos.route("/modelos", methods=["GET", "POST"])
 def modelos():
 
@@ -123,7 +117,6 @@ def modelos():
 
         return redirect(url_for("modelos.modelos"))
 
-    # READ
     filtro_fabricante_id = request.args.get("fabricante_id", type=int)
     pagina = request.args.get("page", 1, type=int)
 
@@ -153,7 +146,6 @@ def modelos():
     )
 
 
-# UPDATE
 @bp_modelos.route(
     "/modelos/<int:id>/editar",
     methods=["GET", "POST"]
@@ -200,7 +192,6 @@ def editar_modelo(id):
     )
 
 
-# DELETE
 @bp_modelos.route(
     "/modelos/<int:id>/excluir",
     methods=["POST"]
@@ -247,7 +238,6 @@ def excluir_modelo(id):
     return redirect(url_for("modelos.modelos"))
 
 
-# CREATE + READ - INTERFACES DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/interfaces",
     methods=["GET", "POST"]
@@ -322,7 +312,6 @@ def interfaces_modelo(modelo_id):
     )
 
 
-# UPDATE - INTERFACE DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/interfaces/<int:interface_id>/editar",
     methods=["GET", "POST"]
@@ -387,7 +376,6 @@ def editar_interface_modelo(modelo_id, interface_id):
     )
 
 
-# DELETE - INTERFACE DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/interfaces/<int:interface_id>/excluir",
     methods=["POST"]
@@ -433,7 +421,6 @@ def excluir_interface_modelo(modelo_id, interface_id):
     )
 
 
-# CREATE + READ - PORTAS DE ALIMENTAÇÃO DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/portas-alimentacao",
     methods=["GET", "POST"]
@@ -515,7 +502,6 @@ def portas_alimentacao_modelo(modelo_id):
     )
 
 
-# UPDATE - PORTA DE ALIMENTAÇÃO DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/portas-alimentacao/<int:porta_id>/editar",
     methods=["GET", "POST"]
@@ -589,7 +575,6 @@ def editar_porta_alimentacao_modelo(modelo_id, porta_id):
     )
 
 
-# DELETE - PORTA DE ALIMENTAÇÃO DO MODELO
 @bp_modelos.route(
     "/modelos/<int:modelo_id>/portas-alimentacao/<int:porta_id>/excluir",
     methods=["POST"]

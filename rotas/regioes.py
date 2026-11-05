@@ -47,13 +47,10 @@ def regiao():
 
         return redirect(url_for("regioes.regiao"))
 
-    # Identificador da região escolhida no seletor
     filtro_regiao_id = request.args.get("filtro_regiao_id", type=int)
 
-    # Busca todas as regiões
     todas_regioes = Regiao.query.order_by(Regiao.nome).all()
 
-    # Busca as regiões principais
     regioes_principais = (
         Regiao.query
         .filter_by(regiao_pai_id=None)
@@ -61,7 +58,6 @@ def regiao():
         .all()
     )
 
-    # Prepara as regiões para o formulário de cadastro e para o filtro
     regioes_para_selecao = []
 
     def organizar_regioes(lista_regioes, nivel=0):
@@ -76,10 +72,8 @@ def regiao():
 
     organizar_regioes(regioes_principais)
 
-    # Por padrão, exibe todas as regiões
     regioes_principais_exibidas = regioes_principais
 
-    # IDs das regiões que serão mostradas no HTML
     ids_regioes_visiveis = {
         item.id for item in todas_regioes
     }
@@ -91,7 +85,6 @@ def regiao():
             flash("A região selecionada não existe.", "erro")
             return redirect(url_for("regioes.regiao"))
 
-        # Começa com a região escolhida e inclui todas as suas sub-regiões
         ids_regioes_visiveis = set()
 
         def incluir_subregioes(item):
@@ -102,12 +95,9 @@ def regiao():
 
         incluir_subregioes(regiao_selecionada)
 
-        # Mantém a hierarquia, mostrando a região escolhida como raiz
         regioes_principais_exibidas = [regiao_selecionada]
 
-        # Se a região escolhida for uma sub-região, a macro HTML
-        # precisa começar nela com nível zero, para exibi-la corretamente.
-        # A hierarquia original do banco de dados não é modificada.
+
 
     return render_template(
         "regiao.html",
@@ -144,8 +134,7 @@ def editar_regiao(id):
                 flash("A região pai selecionada não existe.", "erro")
                 return redirect(url_for("regioes.editar_regiao", id=id))
 
-            # Impede que a região seja pai dela mesma
-            # ou de uma de suas regiões ancestrais.
+
             verificar = regiao_pai
 
             while verificar is not None:
@@ -210,12 +199,10 @@ def excluir_regiao(id):
         flash("Região não encontrada.", "erro")
         return redirect(url_for("regioes.regiao"))
 
-    # Verifica se existem sub-regiões
     if regiao.subregioes:
         flash("Não é possível excluir: esta região possui sub-regiões.", "erro")
         return redirect(url_for("regioes.regiao"))
 
-    # Verifica se existem equipamentos vinculados
     equipamentos_vinculados = Equipamento.query.filter_by(
         regiao_id=id
     ).first()

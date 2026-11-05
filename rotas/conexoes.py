@@ -50,7 +50,6 @@ def conexoes():
             flash("Informe o tipo de cabo.", "erro")
             return redirect(url_for("conexoes.conexoes"))
 
-        # Verifica se alguma das portas já está conectada.
         conexao_existente = Conexao.query.filter(
             db.or_(
                 Conexao.interface_origem_id.in_([origem_id, destino_id]),
@@ -117,7 +116,6 @@ def nova_conexao(interface_id):
             equipamento_id=porta_origem.equipamento_id
         ))
 
-    # Verifica se a porta de origem já está conectada.
     conexao_existente = Conexao.query.filter(
         db.or_(
             Conexao.interface_origem_id == porta_origem.id,
@@ -164,7 +162,6 @@ def nova_conexao(interface_id):
                 .all()
             )
 
-            # Retira da lista as portas que já estão conectadas.
             portas_destino = [
                 porta for porta in portas_destino
                 if not Conexao.query.filter(

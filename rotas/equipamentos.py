@@ -13,7 +13,6 @@ from models.conexao import Conexao
 bp_equipamentos = Blueprint("equipamentos", __name__)
 
 
-# CREATE - CADASTRAR EQUIPAMENTO
 @bp_equipamentos.route("/equipamentos", methods=["GET", "POST"])
 def equipamentos():
 
@@ -30,7 +29,6 @@ def equipamentos():
             return redirect(url_for("equipamentos.equipamentos"))
 
         try:
-            # READ - Verifica se a região existe
             regiao = db.session.get(Regiao, regiao_id)
 
             if regiao is None:
@@ -61,7 +59,6 @@ def equipamentos():
                     flash("Modelo incompatível com o fabricante.", "erro")
                     return redirect(url_for("equipamentos.equipamentos"))
 
-            # CREATE - Cria o equipamento
             novo_equipamento = Equipamento(
                 nome=nome,
                 tipo=tipo,
@@ -73,7 +70,6 @@ def equipamentos():
             db.session.add(novo_equipamento)
             db.session.flush()
 
-            # CREATE - Cria as interfaces do modelo
             if modelo is not None:
 
                 for interface in modelo.interfaces:
@@ -102,7 +98,6 @@ def equipamentos():
 
         return redirect(url_for("equipamentos.equipamentos"))
 
-    # READ - Lista os equipamentos
     filtro_regiao_id = request.args.get("filtro_regiao_id", type=int)
 
     regioes = Regiao.query.order_by(Regiao.nome).all()
@@ -129,7 +124,6 @@ def equipamentos():
     )
 
 
-# READ - DETALHES DO EQUIPAMENTO
 @bp_equipamentos.route("/equipamentos/<int:id>")
 def detalhe_equipamento(id):
 
@@ -145,7 +139,6 @@ def detalhe_equipamento(id):
     )
 
 
-# UPDATE - EDITAR EQUIPAMENTO
 @bp_equipamentos.route("/equipamentos/<int:id>/editar", methods=["GET", "POST"])
 def editar_equipamento(id):
 
@@ -170,7 +163,6 @@ def editar_equipamento(id):
                 flash("Região não encontrada.", "erro")
             else:
                 try:
-                    # UPDATE - Altera os dados
                     equipamento.nome = nome
                     equipamento.tipo = tipo
                     equipamento.regiao_id = regiao.id
@@ -198,7 +190,6 @@ def editar_equipamento(id):
     )
 
 
-# DELETE - EXCLUIR EQUIPAMENTO
 @bp_equipamentos.route("/equipamentos/<int:id>/excluir", methods=["POST"])
 def excluir_equipamento(id):
 
@@ -209,7 +200,6 @@ def excluir_equipamento(id):
         return redirect(url_for("equipamentos.equipamentos"))
 
     try:
-        # READ - Busca as interfaces do equipamento
         portas = InterfaceEquipamento.query.filter_by(
             equipamento_id=equipamento.id
         ).all()
@@ -218,7 +208,6 @@ def excluir_equipamento(id):
 
         if ids_portas:
 
-            # READ - Busca as conexões dessas interfaces
             conexoes = Conexao.query.filter(
                 db.or_(
                     Conexao.interface_origem_id.in_(ids_portas),
@@ -226,15 +215,12 @@ def excluir_equipamento(id):
                 )
             ).all()
 
-            # DELETE - Exclui as conexões
             for conexao in conexoes:
                 db.session.delete(conexao)
 
-            # DELETE - Exclui as interfaces
             for porta in portas:
                 db.session.delete(porta)
 
-        # DELETE - Exclui o equipamento
         db.session.delete(equipamento)
 
         db.session.commit()
@@ -249,7 +235,6 @@ def excluir_equipamento(id):
     return redirect(url_for("equipamentos.equipamentos"))
 
 
-# READ - MODELOS POR FABRICANTE (API)
 @bp_equipamentos.route("/api/fabricantes/<int:fabricante_id>/modelos")
 def modelos_por_fabricante(fabricante_id):
 
@@ -270,7 +255,6 @@ def modelos_por_fabricante(fabricante_id):
     }
 
 
-# READ - PORTAS DO EQUIPAMENTO
 @bp_equipamentos.route("/equipamentos/<int:equipamento_id>/portas")
 def portas_equipamento(equipamento_id):
 

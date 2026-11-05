@@ -15,7 +15,6 @@ from models.fabricante import Fabricante
 bp_fabricantes = Blueprint("fabricantes", __name__)
 
 
-# CREATE + READ
 @bp_fabricantes.route("/fabricantes", methods=["GET", "POST"])
 def fabricantes():
 
@@ -44,7 +43,6 @@ def fabricantes():
 
         return redirect(url_for("fabricantes.fabricantes"))
 
-    # READ
     fabricantes_cadastrados = (
         Fabricante.query
         .order_by(Fabricante.nome)
@@ -57,7 +55,6 @@ def fabricantes():
     )
 
 
-# UPDATE
 @bp_fabricantes.route(
     "/fabricantes/<int:id>/editar",
     methods=["GET", "POST"]
@@ -98,7 +95,6 @@ def editar_fabricante(id):
     )
 
 
-# DELETE
 @bp_fabricantes.route(
     "/fabricantes/<int:id>/excluir",
     methods=["POST"]
