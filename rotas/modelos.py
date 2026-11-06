@@ -21,7 +21,6 @@ bp_modelos = Blueprint("modelos", __name__)
 
 
 def _validar_dados_modelo(modelo_id=None):
-    """Valida o formulário e devolve (dados, erros)."""
 
     fabricante_id = request.form.get("fabricante_id", type=int)
     nome_modelo = request.form.get("modelo", "").strip()

@@ -8,19 +8,18 @@ bp_login = Blueprint("login", __name__)
 USUARIO_PADRAO = "admin"
 SENHA_PADRAO = "netlab"
 
-@bp_login.before_request
 def exigir_login():
-    if request.endpoint in ("login", "static"):
+    if request.endpoint in ("login.login", "login.logout", "static"):
         return None
 
     if not session.get("usuario"):
-        return redirect(url_for("login", next=request.path))
+        return redirect(url_for("login.login", next=request.path))
 
 
 @bp_login.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("usuario"):
-        return redirect(url_for("index"))
+        return redirect(url_for("sistema.index"))
 
     erro = None
 
@@ -34,11 +33,11 @@ def login():
             destino = (
                 request.form.get("next")
                 or request.args.get("next")
-                or url_for("index")
+                or url_for("sistema.index")
             )
 
             if not destino.startswith("/") or destino.startswith("//"):
-                destino = url_for("index")
+                destino = url_for("sistema.index")
 
             return redirect(destino)
 
@@ -50,4 +49,4 @@ def login():
 @bp_login.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("login.login"))

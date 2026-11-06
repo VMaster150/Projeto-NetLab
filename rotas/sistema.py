@@ -1,6 +1,7 @@
 from flask import *
 
 
+
 from config import db
 
 bp_sistema = Blueprint("sistema", __name__)

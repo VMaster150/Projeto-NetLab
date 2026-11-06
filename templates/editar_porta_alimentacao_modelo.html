@@ -9,25 +9,25 @@
 <body>
 
 <header class="cabecalho">
-    <a class="marca" href="{{ url_for('index') }}">
+    <a class="marca" href="{{ url_for('sistema.index') }}">
         <span class="marca-simbolo">N</span>
         <span>NetLab</span>
     </a>
 
     <nav class="navegacao">
-        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('sistema.index') }}">Início</a>
         <a href="{{ url_for('regioes.regiao') }}">Regiões</a>
         <a href="{{ url_for('equipamentos.equipamentos') }}">Equipamentos</a>
         <a href="{{ url_for('fabricantes.fabricantes') }}">Fabricantes</a>
         <a href="{{ url_for('modelos.modelos') }}" class="ativo">Modelos</a>
-        <a class="sair" href="{{ url_for('logout') }}">Sair</a>
+        <a class="sair" href="{{ url_for('login.logout') }}">Sair</a>
 </nav>
 </header>
 
 <main class="conteudo">
 
     <p class="caminho-pagina">
-        <a href="{{ url_for('index') }}">Início</a> /
+        <a href="{{ url_for('sistema.index') }}">Início</a> /
         <a href="{{ url_for('modelos.modelos') }}">Modelos</a> /
         <a href="{{ url_for('modelos.portas_alimentacao_modelo', modelo_id=modelo.id) }}">
             {{ modelo.modelo }}
